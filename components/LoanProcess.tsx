@@ -1,379 +1,288 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 
 const LoanProcess = () => {
-  const [activeStep, setActiveStep] = useState(0);
-  const [isVisible, setIsVisible] = useState(false);
-  const processRef = useRef<HTMLDivElement>(null);
-  const stepRefs = useRef<Array<HTMLDivElement | null>>([]);
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [activeStep, setActiveStep] = useState<number | null>(null);
 
-  // Initialize stepRefs with empty array
   useEffect(() => {
-    stepRefs.current = stepRefs.current.slice(0, 0).concat(new Array(7).fill(null));
+    setIsLoaded(true);
   }, []);
 
-  // Steps data
+  // Define the loan process steps
   const steps = [
     {
-      id: 1,
-      title: 'Pre-Qualification',
-      description: 'Get a quick assessment of your borrowing potential based on your financial information.',
-      icon: (
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-        </svg>
-      ),
-      stats: [
-        { label: 'Time Required', value: '15-30 minutes' },
-        { label: 'Documentation', value: 'Minimal' },
-        { label: 'Credit Check', value: 'Soft Pull' }
+      title: 'Eligibility Check',
+      description: 'Verify your military service and eligibility for VA loan benefits.',
+      icon: 'fa-medal',
+      details: [
+        'Confirm your service status (active duty, veteran, or surviving spouse)',
+        'Verify length of service requirements',
+        'Obtain your Certificate of Eligibility (COE)',
+        'Check your VA entitlement amount'
       ]
     },
     {
-      id: 2,
-      title: 'Certificate of Eligibility',
-      description: 'Obtain your COE to verify your eligibility for a VA loan based on your military service.',
-      icon: (
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-        </svg>
-      ),
-      stats: [
-        { label: 'Time Required', value: '1-3 days' },
-        { label: 'Documentation', value: 'DD-214 or Statement of Service' },
-        { label: 'Validity', value: 'Indefinite for most veterans' }
-      ]
-    },
-    {
-      id: 3,
       title: 'Pre-Approval',
-      description: 'Get formally pre-approved for a specific loan amount after a thorough review of your finances.',
-      icon: (
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
-        </svg>
-      ),
-      stats: [
-        { label: 'Time Required', value: '1-3 days' },
-        { label: 'Documentation', value: 'Income, Assets, Debts' },
-        { label: 'Credit Check', value: 'Hard Pull' }
+      description: 'Get pre-approved to understand your budget and strengthen your offer.',
+      icon: 'fa-file-certificate',
+      details: [
+        'Complete a loan application',
+        'Provide financial documentation',
+        'Credit check and debt-to-income analysis',
+        'Receive your pre-approval letter'
       ]
     },
     {
-      id: 4,
-      title: 'Home Search',
-      description: 'Find your dream home with the confidence of knowing exactly what you can afford.',
-      icon: (
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-        </svg>
-      ),
-      stats: [
-        { label: 'Time Required', value: 'Varies' },
-        { label: 'Property Types', value: 'Primary Residences Only' },
-        { label: 'VA Requirements', value: 'Must Meet Minimum Property Requirements' }
+      title: 'House Hunting',
+      description: 'Find a home that meets VA property requirements and fits your needs.',
+      icon: 'fa-house-magnifying-glass',
+      details: [
+        'Work with a real estate agent familiar with VA loans',
+        'Ensure properties meet VA minimum property requirements (MPRs)',
+        'Make an offer with your pre-approval',
+        'Negotiate terms with the seller'
       ]
     },
     {
-      id: 5,
-      title: 'Loan Application',
-      description: 'Complete your formal loan application once you\'ve found a home and your offer is accepted.',
-      icon: (
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-        </svg>
-      ),
-      stats: [
-        { label: 'Time Required', value: '1-2 hours' },
-        { label: 'Documentation', value: 'Extensive' },
-        { label: 'Processing Time', value: '1-2 days' }
+      title: 'VA Appraisal',
+      description: 'The VA will appraise the property to determine its value and condition.',
+      icon: 'fa-house-flag',
+      details: [
+        'VA assigns a licensed appraiser',
+        'Property is evaluated for fair market value',
+        'Home is inspected for VA minimum property requirements',
+        'Appraisal report is reviewed by the VA'
       ]
     },
     {
-      id: 6,
-      title: 'Processing & Underwriting',
-      description: 'Your loan application is processed and reviewed by underwriters to ensure it meets all requirements.',
-      icon: (
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
-        </svg>
-      ),
-      stats: [
-        { label: 'Time Required', value: '2-3 weeks' },
-        { label: 'Appraisal', value: 'Required' },
-        { label: 'Conditions', value: 'May Require Additional Documentation' }
+      title: 'Loan Processing',
+      description: 'Your lender will process your application and prepare for closing.',
+      icon: 'fa-file-signature',
+      details: [
+        'Lender verifies all documentation',
+        'Underwriter reviews your loan package',
+        'Conditions are cleared for final approval',
+        'Closing disclosure is prepared'
       ]
     },
     {
-      id: 7,
       title: 'Closing',
-      description: 'Sign your final loan documents, pay closing costs, and receive the keys to your new home.',
-      icon: (
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
-        </svg>
-      ),
-      stats: [
-        { label: 'Time Required', value: '1-2 hours' },
-        { label: 'Funding Fee', value: '1.4% - 3.6% of Loan Amount' },
-        { label: 'Cash Needed', value: 'Closing Costs Only (No Down Payment Required)' }
+      description: 'Sign final paperwork, pay closing costs, and receive your keys.',
+      icon: 'fa-handshake',
+      details: [
+        'Review and sign closing documents',
+        'Pay closing costs (if not rolled into loan)',
+        'Funding is completed',
+        'Receive keys to your new home'
       ]
     }
   ];
 
-  // Scroll to active step with improved animation
-  useEffect(() => {
-    if (stepRefs.current[activeStep] && scrollContainerRef.current) {
-      const container = scrollContainerRef.current;
-      const element = stepRefs.current[activeStep];
-      
-      if (element) {
-        // Calculate the scroll position to center the element
-        const elementRect = element.getBoundingClientRect();
-        const containerRect = container.getBoundingClientRect();
-        
-        const scrollTop = element.offsetTop - container.offsetTop - 
-                         (containerRect.height / 2) + (elementRect.height / 2);
-        
-        // Smooth scroll with custom easing
-        const startPosition = container.scrollTop;
-        const distance = scrollTop - startPosition;
-        const duration = 600;
-        let startTime: number | null = null;
-        
-        const easeOutQuart = (t: number): number => 1 - Math.pow(1 - t, 4);
-        
-        const scroll = (timestamp: number) => {
-          if (!startTime) startTime = timestamp;
-          const elapsed = timestamp - startTime;
-          const progress = Math.min(elapsed / duration, 1);
-          const easing = easeOutQuart(progress);
-          
-          container.scrollTop = startPosition + distance * easing;
-          
-          if (progress < 1) {
-            window.requestAnimationFrame(scroll);
-          }
-        };
-        
-        window.requestAnimationFrame(scroll);
-      }
-    }
-  }, [activeStep]);
-
-  // Intersection observer to animate when in view
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true);
-        }
-      },
-      { threshold: 0.1 }
-    );
-
-    if (processRef.current) {
-      observer.observe(processRef.current);
-    }
-
-    return () => {
-      if (processRef.current) {
-        observer.unobserve(processRef.current);
-      }
-    };
-  }, []);
-
-  // Auto-advance steps
-  useEffect(() => {
-    if (!isVisible) return;
-
-    const interval = setInterval(() => {
-      setActiveStep((prev) => (prev === steps.length - 1 ? 0 : prev + 1));
-    }, 8000);
-
-    return () => clearInterval(interval);
-  }, [isVisible, steps.length]);
-
-  // Function to set ref for each step
-  const setStepRef = (el: HTMLDivElement | null, index: number) => {
-    stepRefs.current[index] = el;
-  };
-
-  // Calculate progress percentage
-  const progressPercentage = (activeStep / (steps.length - 1)) * 100;
+  // Floating elements for animation
+  const floatingElements = [
+    { size: 'w-12 h-12', position: 'top-10 right-[10%]', shape: 'rounded-lg', rotation: 'rotate-12', animation: 'animate-float' },
+    { size: 'w-8 h-8', position: 'top-32 left-[5%]', shape: 'rounded-full', rotation: '-rotate-6', animation: 'animate-float-slow' },
+    { size: 'w-10 h-10', position: 'bottom-20 right-[15%]', shape: 'rounded-lg', rotation: 'rotate-45', animation: 'animate-float-reverse' },
+    { size: 'w-6 h-6', position: 'bottom-40 left-[20%]', shape: 'rounded-full', rotation: 'rotate-12', animation: 'animate-float' },
+  ];
 
   return (
-    <section id="loan-process" className="py-20 bg-white relative overflow-hidden">
-      {/* Background elements */}
-      <div className="absolute inset-0 bg-[url('/images/backgrounds/hero-pattern.svg')] bg-repeat opacity-5"></div>
-      <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary via-secondary to-primary"></div>
-      
+    <section id="loan-process" className="py-16 relative overflow-hidden">
+      {/* Dynamic background with neural network pattern */}
+      <div className="absolute inset-0 z-0">
+        <div className="absolute inset-0 bg-gradient-to-br from-gray-50 via-white to-gray-50" />
+        <div className="absolute inset-0 bg-[url('/images/backgrounds/neural-pattern.svg')] bg-repeat opacity-5" />
+        
+        {/* Animated gradient orbs */}
+        <div className="absolute top-1/4 left-1/4 w-64 h-64 rounded-full bg-gradient-to-r from-primary/5 to-primary-light/5 blur-3xl animate-float-slow"></div>
+        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 rounded-full bg-gradient-to-r from-secondary/5 to-secondary-light/5 blur-3xl animate-float"></div>
+        
+        {/* Floating decorative elements */}
+        {floatingElements.map((el, index) => (
+          <div 
+            key={index}
+            className={`absolute ${el.size} ${el.position} ${el.shape} border-2 border-primary/10 ${el.rotation} ${el.animation} hidden lg:block`}
+          ></div>
+        ))}
+      </div>
+
       <div className="container mx-auto px-4 relative z-10">
-        <div className="max-w-3xl mx-auto text-center mb-16">
-          <div className="inline-block px-3 py-1 bg-primary/10 rounded-full text-primary text-xs font-medium tracking-wider uppercase mb-3">
-            The Path To Homeownership
+        {/* Section header with premium divider */}
+        <div className="text-center mb-12 relative">
+          <div className="inline-flex items-center px-4 py-1.5 bg-gradient-to-r from-primary/10 to-primary-light/10 rounded-full text-primary text-sm font-medium mb-4 border border-primary/20">
+            <div className="w-2 h-2 bg-primary rounded-full mr-2 animate-pulse"></div>
+            Simple Process
           </div>
-          <h2 className="text-3xl font-bold text-gray-900 mb-4">VA Loan Process</h2>
-          <div className="w-16 h-1 bg-secondary mx-auto mb-4"></div>
-          <p className="text-gray-600">Your journey to homeownership with a VA loan - streamlined, simplified, and supported every step of the way</p>
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">VA Loan Journey</h2>
+          <p className="text-lg text-gray-600 max-w-2xl mx-auto mb-6">Follow these steps to secure your VA loan and achieve your homeownership goals.</p>
+          
+          {/* Premium divider */}
+          <div className="flex items-center justify-center">
+            <div className="h-0.5 w-12 bg-gradient-to-r from-transparent to-primary/50"></div>
+            <div className="h-1.5 w-1.5 rounded-full bg-primary mx-1"></div>
+            <div className="h-0.5 w-24 bg-gradient-to-r from-primary to-primary-light"></div>
+            <div className="h-1.5 w-1.5 rounded-full bg-primary-light mx-1"></div>
+            <div className="h-0.5 w-12 bg-gradient-to-r from-primary-light/50 to-transparent"></div>
+          </div>
+        </div>
+
+        {/* Timeline */}
+        <div className="max-w-5xl mx-auto relative">
+          {/* Vertical line */}
+          <div className="absolute left-1/2 transform -translate-x-1/2 h-full w-1 bg-gradient-to-b from-primary/20 via-primary/40 to-primary/20 rounded-full"></div>
+          
+          {/* Steps */}
+          <div className="space-y-12 relative">
+            {steps.map((step, index) => (
+              <div 
+                key={index}
+                className={`flex items-center transition-all duration-700 ${
+                  isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+                }`}
+                style={{ transitionDelay: `${index * 150}ms` }}
+                onMouseEnter={() => setActiveStep(index)}
+                onMouseLeave={() => setActiveStep(null)}
+              >
+                {/* Left side (odd steps) */}
+                {index % 2 === 0 && (
+                  <div className="w-1/2 pr-8 text-right">
+                    <div className={`transition-all duration-300 ${activeStep === index ? 'transform -translate-y-1' : ''}`}>
+                      <h3 className="text-xl font-semibold text-gray-900 mb-2">{step.title}</h3>
+                      <p className="text-gray-600">{step.description}</p>
+                      
+                      {/* Details that appear on hover */}
+                      <div className={`mt-4 space-y-2 overflow-hidden transition-all duration-300 ${
+                        activeStep === index ? 'max-h-40 opacity-100' : 'max-h-0 opacity-0'
+                      }`}>
+                        {step.details.map((detail, i) => (
+                          <div key={i} className="flex items-center justify-end text-sm text-gray-600">
+                            <span>{detail}</span>
+                            <div className="w-1.5 h-1.5 rounded-full bg-primary ml-2"></div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
+                
+                {/* Center icon */}
+                <div className="absolute left-1/2 transform -translate-x-1/2 flex flex-col items-center">
+                  <div className={`w-12 h-12 rounded-full bg-gradient-to-br from-primary to-primary-dark text-white flex items-center justify-center z-10 shadow-lg transition-all duration-300 ${
+                    activeStep === index ? 'scale-110 shadow-primary/30' : ''
+                  }`}>
+                    <i className={`fas ${step.icon} text-lg`}></i>
+                  </div>
+                  
+                  {/* Step number */}
+                  <div className="absolute -bottom-6 bg-white text-primary text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center border border-primary/20">
+                    {index + 1}
+                  </div>
+                  
+                  {/* Decorative dots */}
+                  <div className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-secondary"></div>
+                  <div className="absolute -bottom-1 -left-1 w-2 h-2 rounded-full bg-primary-light"></div>
+                </div>
+                
+                {/* Right side (even steps) */}
+                {index % 2 === 1 && (
+                  <div className="w-1/2 pl-8">
+                    <div className={`transition-all duration-300 ${activeStep === index ? 'transform -translate-y-1' : ''}`}>
+                      <h3 className="text-xl font-semibold text-gray-900 mb-2">{step.title}</h3>
+                      <p className="text-gray-600">{step.description}</p>
+                      
+                      {/* Details that appear on hover */}
+                      <div className={`mt-4 space-y-2 overflow-hidden transition-all duration-300 ${
+                        activeStep === index ? 'max-h-40 opacity-100' : 'max-h-0 opacity-0'
+                      }`}>
+                        {step.details.map((detail, i) => (
+                          <div key={i} className="flex items-center text-sm text-gray-600">
+                            <div className="w-1.5 h-1.5 rounded-full bg-primary mr-2"></div>
+                            <span>{detail}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
+                
+                {/* Empty div for even steps on left side */}
+                {index % 2 === 1 && <div className="w-1/2"></div>}
+                
+                {/* Empty div for odd steps on right side */}
+                {index % 2 === 0 && <div className="w-1/2"></div>}
+              </div>
+            ))}
+          </div>
         </div>
         
-        <div 
-          ref={processRef}
-          className={`transition-opacity duration-1000 ${isVisible ? 'opacity-100' : 'opacity-0'}`}
-        >
-          {/* Process visualization */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
-            {/* Left side - Steps visualization */}
-            <div 
-              ref={scrollContainerRef}
-              className="relative max-h-[600px] overflow-y-auto pr-4 hide-scrollbar rounded-lg"
-              style={{
-                scrollbarWidth: 'thin',
-                scrollbarColor: 'rgba(203, 213, 225, 0.5) rgba(243, 244, 246, 0.5)'
-              }}
-            >
-              {/* Steps */}
-              <div className="relative">
-                {/* Timeline line */}
-                <div className="absolute left-[20px] top-0 bottom-0 w-1 bg-gray-200"></div>
-                
-                {steps.map((step, index) => (
-                  <div 
-                    key={step.id}
-                    ref={(el) => setStepRef(el, index)}
-                    className={`flex py-6 ${index !== steps.length - 1 ? 'border-b border-gray-100' : ''}`}
-                    onClick={() => setActiveStep(index)}
-                  >
-                    {/* Circle indicator */}
-                    <div className="relative">
-                      {/* Blue progress line - rendered BEHIND the circle */}
-                      {index > 0 && index <= activeStep && (
-                        <div 
-                          className="absolute left-[20px] top-[-24px] w-1 bg-primary transition-all duration-1500 ease-out"
-                          style={{ height: '24px' }}
-                        ></div>
-                      )}
-                      
-                      {index < activeStep && (
-                        <div 
-                          className="absolute left-[20px] bottom-[-24px] w-1 bg-primary transition-all duration-1500 ease-out"
-                          style={{ height: '24px' }}
-                        ></div>
-                      )}
-                      
-                      <div 
-                        className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-500 ${
-                          index === activeStep 
-                            ? 'bg-primary text-white shadow-lg' 
-                            : index < activeStep 
-                              ? 'bg-primary/20 text-primary' 
-                              : 'bg-gray-100 text-gray-400'
-                        }`}
-                      >
-                        <span className="text-base font-semibold">{step.id}</span>
-                      </div>
-                    </div>
-                    
-                    <div className="ml-5 flex-1">
-                      <h3 className={`text-lg font-semibold mb-1 transition-colors duration-300 ${
-                        index === activeStep ? 'text-primary' : 'text-gray-700'
-                      }`}>
-                        {step.title}
-                      </h3>
-                      <p className="text-sm text-gray-600 mb-2">{step.description}</p>
-                      
-                      {index === activeStep && (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-3 animate-fadeIn">
-                          {step.stats.map((stat, i) => (
-                            <div key={i} className="bg-gray-50 p-2 rounded-lg border-l-2 border-primary">
-                              <p className="text-xs text-gray-500">{stat.label}</p>
-                              <p className="text-sm font-medium text-gray-900">{stat.value}</p>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
+        {/* Final step with glow effect */}
+        <div className="max-w-3xl mx-auto mt-16 relative">
+          <div className="absolute -inset-1 bg-gradient-to-r from-primary/20 via-secondary/20 to-primary/20 rounded-2xl blur-lg opacity-70 group-hover:opacity-100 transition duration-1000 animate-glow"></div>
+          
+          <div className="relative bg-white rounded-xl p-6 shadow-lg border border-primary/10 overflow-hidden">
+            {/* Decorative corner accents */}
+            <div className="absolute -top-1 -left-1 w-8 h-8 border-t-2 border-l-2 border-primary/20 rounded-tl-lg"></div>
+            <div className="absolute -top-1 -right-1 w-8 h-8 border-t-2 border-r-2 border-primary/20 rounded-tr-lg"></div>
+            <div className="absolute -bottom-1 -left-1 w-8 h-8 border-b-2 border-l-2 border-primary/20 rounded-bl-lg"></div>
+            <div className="absolute -bottom-1 -right-1 w-8 h-8 border-b-2 border-r-2 border-primary/20 rounded-br-lg"></div>
             
-            {/* Right side - Active step details */}
-            <div className="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100 transform transition-all duration-700 sticky top-24">
-              <div className="bg-gradient-to-r from-primary to-primary-dark p-6 text-white">
-                <div className="flex items-center">
-                  <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center mr-4">
-                    {steps[activeStep].icon}
-                  </div>
-                  <h3 className="text-xl font-bold">Step {steps[activeStep].id}: {steps[activeStep].title}</h3>
+            <div className="flex flex-col md:flex-row items-center">
+              <div className="md:w-1/2 mb-6 md:mb-0 md:pr-6">
+                <div className="inline-flex items-center px-3 py-1 bg-gradient-to-r from-primary/10 to-primary-light/10 rounded-full text-primary text-sm font-medium mb-3 border border-primary/20">
+                  <div className="w-1.5 h-1.5 bg-primary rounded-full mr-2"></div>
+                  Ready to Start?
                 </div>
+                <h3 className="text-2xl font-bold text-gray-900 mb-3">Begin Your VA Loan Journey Today</h3>
+                <p className="text-gray-600 mb-6">Our team of VA loan specialists is ready to guide you through every step of the process and help you achieve your homeownership goals.</p>
+                
+                <button className="px-6 py-3 bg-gradient-to-r from-primary to-primary-dark text-white rounded-lg hover:from-primary-dark hover:to-primary transition duration-200 shadow-md flex items-center justify-center space-x-2 group">
+                  <i className="fas fa-rocket mr-2 group-hover:animate-bounce-subtle"></i>
+                  <span>Get Started Now</span>
+                </button>
               </div>
               
-              <div className="p-6">
-                <div className="mb-6">
-                  <h4 className="text-sm font-medium uppercase tracking-wider text-gray-500 mb-3">About This Step</h4>
-                  <p className="text-gray-700">{steps[activeStep].description}</p>
-                </div>
-                
-                <div className="mb-6">
-                  <h4 className="text-sm font-medium uppercase tracking-wider text-gray-500 mb-3">Key Information</h4>
-                  <div className="grid grid-cols-1 gap-4">
-                    {steps[activeStep].stats.map((stat, i) => (
-                      <div key={i} className="flex justify-between p-3 bg-gray-50 rounded-lg">
-                        <span className="text-gray-700 font-medium">{stat.label}:</span>
-                        <span className="text-primary font-semibold">{stat.value}</span>
+              <div className="md:w-1/2 relative">
+                <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-secondary/5 rounded-lg"></div>
+                <div className="relative p-4">
+                  <div className="aspect-w-16 aspect-h-9 rounded-lg overflow-hidden shadow-lg border border-primary/10">
+                    <Image 
+                      src="/images/va-loan-success.jpg" 
+                      alt="VA Loan Success Story" 
+                      width={500} 
+                      height={300}
+                      className="object-cover"
+                    />
+                    
+                    {/* Play button overlay */}
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="w-16 h-16 rounded-full bg-white/80 backdrop-blur-sm flex items-center justify-center shadow-lg border border-white/50 cursor-pointer hover:scale-110 transition-transform duration-200">
+                        <div className="w-12 h-12 rounded-full bg-gradient-to-r from-primary to-primary-dark flex items-center justify-center">
+                          <i className="fas fa-play text-white"></i>
+                        </div>
                       </div>
-                    ))}
-                  </div>
-                </div>
-                
-                <div className="flex justify-between items-center">
-                  <button 
-                    onClick={() => setActiveStep(prev => prev === 0 ? steps.length - 1 : prev - 1)}
-                    className="p-2 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors"
-                    aria-label="Previous step"
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                    </svg>
-                  </button>
-                  
-                  <div className="flex space-x-2">
-                    {steps.map((_, index) => (
-                      <button
-                        key={index}
-                        onClick={() => setActiveStep(index)}
-                        className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${
-                          index === activeStep ? 'bg-primary w-6' : 'bg-gray-300'
-                        }`}
-                        aria-label={`Go to step ${index + 1}`}
-                      />
-                    ))}
+                    </div>
                   </div>
                   
-                  <button 
-                    onClick={() => setActiveStep(prev => prev === steps.length - 1 ? 0 : prev + 1)}
-                    className="p-2 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors"
-                    aria-label="Next step"
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
-                  </button>
+                  {/* Success stats */}
+                  <div className="absolute -bottom-4 -right-4 bg-white rounded-lg p-3 shadow-lg border border-primary/10">
+                    <div className="flex items-center space-x-3">
+                      <div className="text-center">
+                        <div className="text-xl font-bold text-primary">98%</div>
+                        <div className="text-xs text-gray-500">Success Rate</div>
+                      </div>
+                      <div className="h-8 w-px bg-gray-200"></div>
+                      <div className="text-center">
+                        <div className="text-xl font-bold text-secondary">14k+</div>
+                        <div className="text-xs text-gray-500">Veterans Helped</div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-          
-          {/* CTA */}
-          <div className="mt-16 text-center">
-            <button className="px-8 py-4 bg-primary hover:bg-primary-dark text-white font-medium rounded-md transition-colors duration-300 shadow-sm">
-              Start Your VA Loan Journey Today
-            </button>
           </div>
         </div>
       </div>

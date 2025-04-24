@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useState, useEffect } from 'react';
 import { Tab } from '@headlessui/react';
 
@@ -133,10 +135,10 @@ const Calculator = () => {
         <div className="max-w-4xl mx-auto">
           <Tab.Group onChange={(index) => setActiveTab(index)}>
             <Tab.List className="flex p-1 space-x-2 bg-white rounded-xl shadow-md mb-8 border border-primary/10">
-              {['Payment Calculator', 'Affordability Calculator'].map((category, idx) => (
+              {['Payment Calculator', 'Affordability Calculator'].map((category, idx: number) => (
                 <Tab
                   key={idx}
-                  className={({ selected }) =>
+                  className={({ selected }: { selected: boolean }) =>
                     classNames(
                       'w-full py-3 text-sm font-medium rounded-lg transition-all duration-200',
                       'focus:outline-none focus:ring-2 focus:ring-primary/40 ring-offset-2 ring-offset-primary/10',
