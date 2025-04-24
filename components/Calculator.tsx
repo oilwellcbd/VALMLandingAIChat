@@ -1,93 +1,78 @@
-'use client';
+import React, { useState, useEffect } from 'react';
+import { Tab } from '@headlessui/react';
 
-import { useState, useEffect, useRef } from 'react';
+function classNames(...classes: string[]) {
+  return classes.filter(Boolean).join(' ');
+}
 
 const Calculator = () => {
-  // Payment calculator state
-  const [loanAmount, setLoanAmount] = useState(300000);
-  const [interestRate, setInterestRate] = useState(5.5);
+  // Payment Calculator State
+  const [loanAmount, setLoanAmount] = useState(200000);
+  const [interestRate, setInterestRate] = useState(3.5);
   const [loanTerm, setLoanTerm] = useState(30);
   const [monthlyPayment, setMonthlyPayment] = useState(0);
-  const [fundingFee, setFundingFee] = useState(0);
-  const [totalCost, setTotalCost] = useState(0);
   
-  // Affordability calculator state
-  const [annualIncome, setAnnualIncome] = useState(80000);
-  const [monthlyDebts, setMonthlyDebts] = useState(500);
-  const [downPayment, setDownPayment] = useState(0);
+  // Affordability Calculator State
+  const [income, setIncome] = useState(5000);
+  const [debts, setDebts] = useState(500);
+  const [downPayment, setDownPayment] = useState(20000);
   const [affordableAmount, setAffordableAmount] = useState(0);
   
-  // Active calculator tab
-  const [activeTab, setActiveTab] = useState('payment');
-  const [animating, setAnimating] = useState(false);
-  const calculatorContentRef = useRef<HTMLDivElement>(null);
-  
-  // Handle tab change with animation
-  const handleTabChange = (tab: string) => {
-    if (tab === activeTab) return;
+  // Animation state
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [activeTab, setActiveTab] = useState(0);
+  const [isHovering, setIsHovering] = useState<number | null>(null);
+
+  useEffect(() => {
+    setIsLoaded(true);
+    calculatePayment();
+    calculateAffordability();
+  }, []);
+
+  const calculatePayment = () => {
+    const principal = loanAmount;
+    const monthlyRate = interestRate / 100 / 12;
+    const numberOfPayments = loanTerm * 12;
     
-    setAnimating(true);
-    setTimeout(() => {
-      setActiveTab(tab);
-      setTimeout(() => {
-        setAnimating(false);
-      }, 300);
-    }, 300);
+    if (monthlyRate === 0) {
+      setMonthlyPayment(principal / numberOfPayments);
+    } else {
+      const payment = principal * (monthlyRate * Math.pow(1 + monthlyRate, numberOfPayments)) / (Math.pow(1 + monthlyRate, numberOfPayments) - 1);
+      setMonthlyPayment(payment);
+    }
   };
 
-  // Calculate monthly payment
-  useEffect(() => {
-    if (loanAmount > 0 && interestRate > 0 && loanTerm > 0) {
-      // Convert annual interest rate to monthly and decimal
-      const monthlyRate = interestRate / 100 / 12;
-      
-      // Calculate number of payments
-      const payments = loanTerm * 12;
-      
-      // Calculate funding fee (simplified version)
-      const feePercentage = 2.3 / 100; // 2.3% for first use with no down payment
-      const calculatedFundingFee = loanAmount * feePercentage;
-      setFundingFee(calculatedFundingFee);
-      
-      // Add funding fee to loan amount for total loan
-      const totalLoan = loanAmount + calculatedFundingFee;
-      
-      // Calculate monthly payment using formula: P = L[c(1 + c)^n]/[(1 + c)^n - 1]
-      const payment = totalLoan * (monthlyRate * Math.pow(1 + monthlyRate, payments)) / (Math.pow(1 + monthlyRate, payments) - 1);
-      
-      setMonthlyPayment(payment);
-      setTotalCost(payment * payments);
+  const calculateAffordability = () => {
+    // Using the 28/36 rule
+    // 28% of monthly income for housing
+    // 36% of monthly income for all debt (including housing)
+    
+    const maxMonthlyPayment = Math.min(income * 0.28, income * 0.36 - debts);
+    
+    // Reverse the mortgage payment formula to find the loan amount
+    const monthlyRate = interestRate / 100 / 12;
+    const numberOfPayments = loanTerm * 12;
+    
+    let affordable;
+    if (monthlyRate === 0) {
+      affordable = maxMonthlyPayment * numberOfPayments;
     } else {
-      setMonthlyPayment(0);
-      setTotalCost(0);
+      affordable = maxMonthlyPayment * ((Math.pow(1 + monthlyRate, numberOfPayments) - 1) / (monthlyRate * Math.pow(1 + monthlyRate, numberOfPayments)));
     }
-  }, [loanAmount, interestRate, loanTerm]);
+    
+    // Add down payment to get total affordable amount
+    affordable += downPayment;
+    
+    setAffordableAmount(affordable);
+  };
 
-  // Calculate affordable amount
-  useEffect(() => {
-    if (annualIncome > 0) {
-      // Convert annual income to monthly
-      const monthlyIncome = annualIncome / 12;
-      
-      // Maximum recommended DTI (Debt-to-Income) ratio for VA loans is around 41%
-      const maxMonthlyPayment = monthlyIncome * 0.41 - monthlyDebts;
-      
-      // Convert monthly payment to loan amount (reverse of payment calculation)
-      // This is a simplified calculation
-      const monthlyRate = 5.5 / 100 / 12; // Using 5.5% as a default rate
-      const payments = 30 * 12; // 30 years
-      
-      // Formula: L = P[((1 + c)^n - 1)/(c(1 + c)^n)]
-      const loanAmount = maxMonthlyPayment * ((Math.pow(1 + monthlyRate, payments) - 1) / (monthlyRate * Math.pow(1 + monthlyRate, payments)));
-      
-      // Add down payment to get total affordable amount
-      setAffordableAmount(loanAmount + downPayment);
-    } else {
-      setAffordableAmount(0);
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>, setter: React.Dispatch<React.SetStateAction<number>>) => {
+    const value = parseFloat(e.target.value);
+    if (!isNaN(value)) {
+      setter(value);
     }
-  }, [annualIncome, monthlyDebts, downPayment]);
+  };
 
-  // Format currency
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
@@ -97,384 +82,369 @@ const Calculator = () => {
     }).format(value);
   };
 
+  // Floating elements for animation
+  const floatingElements = [
+    { size: 'w-12 h-12', position: 'top-10 right-[10%]', shape: 'rounded-lg', rotation: 'rotate-12', animation: 'animate-float' },
+    { size: 'w-8 h-8', position: 'top-32 left-[5%]', shape: 'rounded-full', rotation: '-rotate-6', animation: 'animate-float-slow' },
+    { size: 'w-10 h-10', position: 'bottom-20 right-[15%]', shape: 'rounded-lg', rotation: 'rotate-45', animation: 'animate-float-reverse' },
+    { size: 'w-6 h-6', position: 'bottom-40 left-[20%]', shape: 'rounded-full', rotation: 'rotate-12', animation: 'animate-float' },
+  ];
+
   return (
-    <section id="calculator" className="py-24 relative bg-white">
-      {/* Background elements */}
-      <div className="absolute inset-0 bg-[url('/images/backgrounds/hero-pattern.svg')] bg-repeat opacity-5"></div>
-      <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary via-secondary to-primary"></div>
-      
+    <section id="calculator" className="py-16 relative overflow-hidden">
+      {/* Dynamic background with neural network pattern */}
+      <div className="absolute inset-0 z-0">
+        <div className="absolute inset-0 bg-gradient-to-br from-gray-50 via-white to-gray-50" />
+        <div className="absolute inset-0 bg-[url('/images/backgrounds/neural-pattern.svg')] bg-repeat opacity-5" />
+        
+        {/* Animated gradient orbs */}
+        <div className="absolute top-1/4 left-1/4 w-64 h-64 rounded-full bg-gradient-to-r from-primary/5 to-primary-light/5 blur-3xl animate-float-slow"></div>
+        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 rounded-full bg-gradient-to-r from-secondary/5 to-secondary-light/5 blur-3xl animate-float"></div>
+        
+        {/* Floating decorative elements */}
+        {floatingElements.map((el, index) => (
+          <div 
+            key={index}
+            className={`absolute ${el.size} ${el.position} ${el.shape} border-2 border-primary/10 ${el.rotation} ${el.animation} hidden lg:block`}
+          ></div>
+        ))}
+      </div>
+
       <div className="container mx-auto px-4 relative z-10">
-        <div className="max-w-3xl mx-auto text-center mb-16">
-          <div className="inline-block px-3 py-1 bg-primary/10 rounded-full text-primary text-xs font-medium tracking-wider uppercase mb-3">
-            Financial Planning
+        {/* Section header with premium divider */}
+        <div className="text-center mb-12 relative">
+          <div className="inline-flex items-center px-4 py-1.5 bg-gradient-to-r from-primary/10 to-primary-light/10 rounded-full text-primary text-sm font-medium mb-4 border border-primary/20">
+            <div className="w-2 h-2 bg-primary rounded-full mr-2 animate-pulse"></div>
+            Financial Tools
           </div>
-          <h2 className="text-3xl font-bold text-gray-900 mb-4">VA Loan Calculators</h2>
-          <div className="w-16 h-1 bg-secondary mx-auto mb-4"></div>
-          <p className="text-gray-600">Plan your VA loan with precision using our sophisticated financial tools</p>
-        </div>
-        
-        {/* Calculator Tabs */}
-        <div className="max-w-3xl mx-auto mb-12">
-          <div className="flex flex-wrap justify-center">
-            <div className="bg-white p-1.5 rounded-full shadow-md flex space-x-1 border border-gray-100">
-              <button
-                className={`px-6 py-2.5 rounded-full transition-all duration-300 text-sm font-medium ${
-                  activeTab === 'payment' ? 'bg-primary text-white shadow-sm' : 'text-gray-600 hover:bg-gray-100'
-                }`}
-                onClick={() => handleTabChange('payment')}
-              >
-                Payment Calculator
-              </button>
-              <button
-                className={`px-6 py-2.5 rounded-full transition-all duration-300 text-sm font-medium ${
-                  activeTab === 'affordability' ? 'bg-primary text-white shadow-sm' : 'text-gray-600 hover:bg-gray-100'
-                }`}
-                onClick={() => handleTabChange('affordability')}
-              >
-                Affordability Calculator
-              </button>
-            </div>
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Loan Calculators</h2>
+          <p className="text-lg text-gray-600 max-w-2xl mx-auto mb-6">Use our tools to estimate your monthly payments and determine how much home you can afford.</p>
+          
+          {/* Premium divider */}
+          <div className="flex items-center justify-center">
+            <div className="h-0.5 w-12 bg-gradient-to-r from-transparent to-primary/50"></div>
+            <div className="h-1.5 w-1.5 rounded-full bg-primary mx-1"></div>
+            <div className="h-0.5 w-24 bg-gradient-to-r from-primary to-primary-light"></div>
+            <div className="h-1.5 w-1.5 rounded-full bg-primary-light mx-1"></div>
+            <div className="h-0.5 w-12 bg-gradient-to-r from-primary-light/50 to-transparent"></div>
           </div>
         </div>
-        
-        {/* Calculator Content */}
+
         <div className="max-w-4xl mx-auto">
-          <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100">
-            <div className="grid grid-cols-1 md:grid-cols-2">
-              {/* Left Column - Inputs */}
-              <div className="p-6 md:p-8 bg-gray-50 border-r border-gray-100">
-                <h3 className="text-xl font-semibold text-gray-900 mb-6">
-                  {activeTab === 'payment' ? 'Calculate Your Monthly Payment' : 'How Much Home Can You Afford?'}
-                </h3>
+          <Tab.Group onChange={(index) => setActiveTab(index)}>
+            <Tab.List className="flex p-1 space-x-2 bg-white rounded-xl shadow-md mb-8 border border-primary/10">
+              {['Payment Calculator', 'Affordability Calculator'].map((category, idx) => (
+                <Tab
+                  key={idx}
+                  className={({ selected }) =>
+                    classNames(
+                      'w-full py-3 text-sm font-medium rounded-lg transition-all duration-200',
+                      'focus:outline-none focus:ring-2 focus:ring-primary/40 ring-offset-2 ring-offset-primary/10',
+                      selected
+                        ? 'bg-gradient-to-r from-primary to-primary-dark text-white shadow-md'
+                        : 'text-gray-600 hover:text-primary hover:bg-primary/5'
+                    )
+                  }
+                  onMouseEnter={() => setIsHovering(idx)}
+                  onMouseLeave={() => setIsHovering(null)}
+                >
+                  <div className="flex items-center justify-center space-x-2">
+                    <i className={`fas ${idx === 0 ? 'fa-calculator' : 'fa-home'} ${isHovering === idx && activeTab !== idx ? 'animate-bounce-subtle' : ''}`}></i>
+                    <span>{category}</span>
+                  </div>
+                </Tab>
+              ))}
+            </Tab.List>
+            
+            <Tab.Panels className="mt-2">
+              {/* Payment Calculator Panel */}
+              <Tab.Panel className={classNames(
+                'bg-white rounded-xl p-6 shadow-lg border border-primary/10',
+                'focus:outline-none focus:ring-2 focus:ring-primary/40 ring-offset-2 ring-offset-primary/10',
+                'transform transition-all duration-500',
+                isLoaded ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
+              )}>
+                <div className="relative">
+                  {/* Decorative corner accents */}
+                  <div className="absolute -top-1 -left-1 w-8 h-8 border-t-2 border-l-2 border-primary/20 rounded-tl-lg"></div>
+                  <div className="absolute -top-1 -right-1 w-8 h-8 border-t-2 border-r-2 border-primary/20 rounded-tr-lg"></div>
+                  <div className="absolute -bottom-1 -left-1 w-8 h-8 border-b-2 border-l-2 border-primary/20 rounded-bl-lg"></div>
+                  <div className="absolute -bottom-1 -right-1 w-8 h-8 border-b-2 border-r-2 border-primary/20 rounded-br-lg"></div>
                 
-                {activeTab === 'payment' ? (
-                  <div className="space-y-6">
-                    <div>
-                      <div className="flex justify-between mb-2">
-                        <label className="text-sm font-medium text-gray-700">Loan Amount: {formatCurrency(loanAmount)}</label>
-                        <span className="text-xs text-primary">{(loanAmount / 1000000 * 100).toFixed(0)}%</span>
-                      </div>
-                      <div className="relative">
-                        <input
-                          type="range"
-                          min="50000"
-                          max="1000000"
-                          step="5000"
-                          value={loanAmount}
-                          onChange={(e) => setLoanAmount(Number(e.target.value))}
-                          className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-primary"
-                        />
-                        <div className="absolute -bottom-4 left-0 text-xs text-gray-500">$50K</div>
-                        <div className="absolute -bottom-4 right-0 text-xs text-gray-500">$1M</div>
-                      </div>
-                    </div>
-                    
-                    <div>
-                      <div className="flex justify-between mb-2">
-                        <label className="text-sm font-medium text-gray-700">Interest Rate: {interestRate}%</label>
-                        <span className="text-xs text-primary">{((interestRate - 2) / 8 * 100).toFixed(0)}%</span>
-                      </div>
-                      <div className="relative">
-                        <input
-                          type="range"
-                          min="2"
-                          max="10"
-                          step="0.125"
-                          value={interestRate}
-                          onChange={(e) => setInterestRate(Number(e.target.value))}
-                          className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-primary"
-                        />
-                        <div className="absolute -bottom-4 left-0 text-xs text-gray-500">2%</div>
-                        <div className="absolute -bottom-4 right-0 text-xs text-gray-500">10%</div>
-                      </div>
-                    </div>
-                    
-                    <div>
-                      <div className="flex justify-between mb-2">
-                        <label className="text-sm font-medium text-gray-700">Loan Term: {loanTerm} years</label>
-                        <span className="text-xs text-primary">{((loanTerm - 10) / 20 * 100).toFixed(0)}%</span>
-                      </div>
-                      <div className="relative">
-                        <input
-                          type="range"
-                          min="10"
-                          max="30"
-                          step="5"
-                          value={loanTerm}
-                          onChange={(e) => setLoanTerm(Number(e.target.value))}
-                          className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-primary"
-                        />
-                        <div className="absolute -bottom-4 left-0 text-xs text-gray-500">10yr</div>
-                        <div className="absolute -bottom-4 right-0 text-xs text-gray-500">30yr</div>
-                      </div>
-                    </div>
-                    
-                    <div className="pt-6 mt-6 border-t border-gray-200">
-                      <div className="flex items-center justify-between mb-4">
-                        <span className="text-sm text-gray-600">VA Funding Fee:</span>
-                        <div className="flex items-center">
-                          <span className="text-sm font-medium">{formatCurrency(fundingFee)}</span>
-                          <div className="ml-2 group relative">
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                            <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-48 p-2 bg-gray-800 text-white text-xs rounded opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-opacity duration-200">
-                              VA funding fee is 2.3% for first-time use with no down payment. Veterans with service-connected disabilities may be exempt.
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div className="space-y-6">
+                      <h3 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-primary-dark text-white flex items-center justify-center mr-2">
+                          <i className="fas fa-sliders-h text-xs"></i>
+                        </div>
+                        Input Parameters
+                      </h3>
+                      
+                      <div className="space-y-4">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">Loan Amount</label>
+                          <div className="relative">
+                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                              <span className="text-gray-500 sm:text-sm">$</span>
                             </div>
+                            <input
+                              type="number"
+                              value={loanAmount}
+                              onChange={(e) => handleInputChange(e, setLoanAmount)}
+                              onBlur={calculatePayment}
+                              className="block w-full pl-7 pr-12 py-2 border border-primary/20 rounded-lg focus:ring-primary focus:border-primary"
+                              placeholder="0"
+                            />
+                          </div>
+                          <div className="mt-1 flex justify-between">
+                            <span className="text-xs text-gray-500">Min: $50,000</span>
+                            <span className="text-xs text-gray-500">Max: $1,000,000</span>
                           </div>
                         </div>
-                      </div>
-                      
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm text-gray-600">Total Loan Amount:</span>
-                        <span className="text-sm font-medium">{formatCurrency(loanAmount + fundingFee)}</span>
-                      </div>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="space-y-6">
-                    <div>
-                      <div className="flex justify-between mb-2">
-                        <label className="text-sm font-medium text-gray-700">Annual Income: {formatCurrency(annualIncome)}</label>
-                        <span className="text-xs text-primary">{(annualIncome / 300000 * 100).toFixed(0)}%</span>
-                      </div>
-                      <div className="relative">
-                        <input
-                          type="range"
-                          min="30000"
-                          max="300000"
-                          step="5000"
-                          value={annualIncome}
-                          onChange={(e) => setAnnualIncome(Number(e.target.value))}
-                          className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-primary"
-                        />
-                        <div className="absolute -bottom-4 left-0 text-xs text-gray-500">$30K</div>
-                        <div className="absolute -bottom-4 right-0 text-xs text-gray-500">$300K</div>
-                      </div>
-                    </div>
-                    
-                    <div>
-                      <div className="flex justify-between mb-2">
-                        <label className="text-sm font-medium text-gray-700">Monthly Debts: {formatCurrency(monthlyDebts)}</label>
-                        <span className="text-xs text-primary">{(monthlyDebts / 5000 * 100).toFixed(0)}%</span>
-                      </div>
-                      <div className="relative">
-                        <input
-                          type="range"
-                          min="0"
-                          max="5000"
-                          step="100"
-                          value={monthlyDebts}
-                          onChange={(e) => setMonthlyDebts(Number(e.target.value))}
-                          className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-primary"
-                        />
-                        <div className="absolute -bottom-4 left-0 text-xs text-gray-500">$0</div>
-                        <div className="absolute -bottom-4 right-0 text-xs text-gray-500">$5K</div>
-                      </div>
-                    </div>
-                    
-                    <div>
-                      <div className="flex justify-between mb-2">
-                        <label className="text-sm font-medium text-gray-700">Down Payment: {formatCurrency(downPayment)}</label>
-                        <span className="text-xs text-primary">{(downPayment / 100000 * 100).toFixed(0)}%</span>
-                      </div>
-                      <div className="relative">
-                        <input
-                          type="range"
-                          min="0"
-                          max="100000"
-                          step="5000"
-                          value={downPayment}
-                          onChange={(e) => setDownPayment(Number(e.target.value))}
-                          className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-primary"
-                        />
-                        <div className="absolute -bottom-4 left-0 text-xs text-gray-500">$0</div>
-                        <div className="absolute -bottom-4 right-0 text-xs text-gray-500">$100K</div>
-                      </div>
-                    </div>
-                    
-                    <div className="pt-6 mt-6 border-t border-gray-200">
-                      <div className="flex items-center justify-between mb-4">
-                        <span className="text-sm text-gray-600">Monthly Income:</span>
-                        <span className="text-sm font-medium">{formatCurrency(annualIncome / 12)}</span>
-                      </div>
-                      
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm text-gray-600">Debt-to-Income Ratio:</span>
-                        <div className="flex items-center">
-                          <span className="text-sm font-medium">41%</span>
-                          <div className="ml-2 group relative">
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                            <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-48 p-2 bg-gray-800 text-white text-xs rounded opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-opacity duration-200">
-                              VA loans typically allow a maximum debt-to-income ratio of 41%, which is more flexible than conventional loans.
+                        
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">Interest Rate (%)</label>
+                          <div className="relative">
+                            <input
+                              type="number"
+                              value={interestRate}
+                              onChange={(e) => handleInputChange(e, setInterestRate)}
+                              onBlur={calculatePayment}
+                              className="block w-full pr-12 py-2 border border-primary/20 rounded-lg focus:ring-primary focus:border-primary"
+                              placeholder="0"
+                              step="0.1"
+                            />
+                            <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                              <span className="text-gray-500 sm:text-sm">%</span>
                             </div>
                           </div>
+                          <div className="mt-1 flex justify-between">
+                            <span className="text-xs text-gray-500">Current Avg: 3.5%</span>
+                            <span className="text-xs text-gray-500">VA Min: 2.25%</span>
+                          </div>
+                        </div>
+                        
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">Loan Term (years)</label>
+                          <select
+                            value={loanTerm}
+                            onChange={(e) => {
+                              setLoanTerm(parseInt(e.target.value));
+                              calculatePayment();
+                            }}
+                            className="block w-full py-2 border border-primary/20 rounded-lg focus:ring-primary focus:border-primary"
+                          >
+                            <option value={15}>15 years</option>
+                            <option value={20}>20 years</option>
+                            <option value={30}>30 years</option>
+                          </select>
+                        </div>
+                        
+                        <button
+                          onClick={calculatePayment}
+                          className="w-full py-2 px-4 bg-gradient-to-r from-primary to-primary-dark text-white rounded-lg hover:from-primary-dark hover:to-primary transition duration-200 shadow-md flex items-center justify-center space-x-2 group"
+                        >
+                          <i className="fas fa-calculator group-hover:animate-bounce-subtle"></i>
+                          <span>Calculate Payment</span>
+                        </button>
+                      </div>
+                    </div>
+                    
+                    <div className="bg-gradient-to-br from-gray-50 to-white rounded-xl p-6 border border-primary/10 shadow-inner flex flex-col justify-center items-center relative overflow-hidden">
+                      {/* Decorative background elements */}
+                      <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-primary/5 to-transparent rounded-bl-[100px]"></div>
+                      <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-secondary/5 to-transparent rounded-tr-[100px]"></div>
+                      
+                      <h3 className="text-xl font-semibold text-gray-900 mb-6 flex items-center">
+                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-secondary to-secondary-dark text-white flex items-center justify-center mr-2">
+                          <i className="fas fa-chart-line text-xs"></i>
+                        </div>
+                        Monthly Payment
+                      </h3>
+                      
+                      <div className="text-5xl font-bold text-primary mb-4 relative">
+                        {/* Subtle glow effect */}
+                        <div className="absolute inset-0 bg-primary/5 blur-xl rounded-full"></div>
+                        {formatCurrency(monthlyPayment)}
+                      </div>
+                      
+                      <div className="text-sm text-gray-500 mb-6">Estimated monthly payment</div>
+                      
+                      <div className="w-full space-y-3">
+                        <div className="flex justify-between text-sm">
+                          <span className="text-gray-600">Principal & Interest</span>
+                          <span className="font-medium">{formatCurrency(monthlyPayment)}</span>
+                        </div>
+                        <div className="flex justify-between text-sm">
+                          <span className="text-gray-600">Property Taxes (est.)</span>
+                          <span className="font-medium">{formatCurrency(loanAmount * 0.015 / 12)}</span>
+                        </div>
+                        <div className="flex justify-between text-sm">
+                          <span className="text-gray-600">Insurance (est.)</span>
+                          <span className="font-medium">{formatCurrency(loanAmount * 0.005 / 12)}</span>
+                        </div>
+                        <div className="h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent my-2"></div>
+                        <div className="flex justify-between text-sm font-semibold">
+                          <span className="text-gray-800">Total Payment</span>
+                          <span>{formatCurrency(monthlyPayment + (loanAmount * 0.015 / 12) + (loanAmount * 0.005 / 12))}</span>
                         </div>
                       </div>
                     </div>
                   </div>
-                )}
-              </div>
+                </div>
+              </Tab.Panel>
               
-              {/* Right Column - Results */}
-              <div 
-                ref={calculatorContentRef}
-                className={`p-6 md:p-8 min-h-[500px] flex flex-col transition-opacity duration-300 ${animating ? 'opacity-0' : 'opacity-100'}`}
-              >
-                {activeTab === 'payment' ? (
-                  <>
-                    <div className="mb-8">
-                      <div className="text-center">
-                        <div className="relative inline-block">
-                          <div className="absolute inset-0 bg-primary/10 rounded-full blur-xl transform scale-110"></div>
-                          <div className="relative bg-white rounded-full p-6 border-2 border-primary/20 shadow-lg">
-                            <span className="text-4xl font-bold text-primary">{formatCurrency(monthlyPayment)}</span>
-                            <p className="text-sm text-gray-500 mt-1">Monthly Payment</p>
+              {/* Affordability Calculator Panel */}
+              <Tab.Panel className={classNames(
+                'bg-white rounded-xl p-6 shadow-lg border border-primary/10',
+                'focus:outline-none focus:ring-2 focus:ring-primary/40 ring-offset-2 ring-offset-primary/10',
+                'transform transition-all duration-500',
+                isLoaded ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
+              )}>
+                <div className="relative">
+                  {/* Decorative corner accents */}
+                  <div className="absolute -top-1 -left-1 w-8 h-8 border-t-2 border-l-2 border-primary/20 rounded-tl-lg"></div>
+                  <div className="absolute -top-1 -right-1 w-8 h-8 border-t-2 border-r-2 border-primary/20 rounded-tr-lg"></div>
+                  <div className="absolute -bottom-1 -left-1 w-8 h-8 border-b-2 border-l-2 border-primary/20 rounded-bl-lg"></div>
+                  <div className="absolute -bottom-1 -right-1 w-8 h-8 border-b-2 border-r-2 border-primary/20 rounded-br-lg"></div>
+                
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div className="space-y-6">
+                      <h3 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-primary-dark text-white flex items-center justify-center mr-2">
+                          <i className="fas fa-sliders-h text-xs"></i>
+                        </div>
+                        Input Parameters
+                      </h3>
+                      
+                      <div className="space-y-4">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">Monthly Income</label>
+                          <div className="relative">
+                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                              <span className="text-gray-500 sm:text-sm">$</span>
+                            </div>
+                            <input
+                              type="number"
+                              value={income}
+                              onChange={(e) => handleInputChange(e, setIncome)}
+                              onBlur={calculateAffordability}
+                              className="block w-full pl-7 pr-12 py-2 border border-primary/20 rounded-lg focus:ring-primary focus:border-primary"
+                              placeholder="0"
+                            />
+                          </div>
+                          <div className="mt-1 text-xs text-gray-500">After-tax monthly income</div>
+                        </div>
+                        
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">Monthly Debts</label>
+                          <div className="relative">
+                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                              <span className="text-gray-500 sm:text-sm">$</span>
+                            </div>
+                            <input
+                              type="number"
+                              value={debts}
+                              onChange={(e) => handleInputChange(e, setDebts)}
+                              onBlur={calculateAffordability}
+                              className="block w-full pl-7 pr-12 py-2 border border-primary/20 rounded-lg focus:ring-primary focus:border-primary"
+                              placeholder="0"
+                            />
+                          </div>
+                          <div className="mt-1 text-xs text-gray-500">Car payments, credit cards, student loans, etc.</div>
+                        </div>
+                        
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">Down Payment</label>
+                          <div className="relative">
+                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                              <span className="text-gray-500 sm:text-sm">$</span>
+                            </div>
+                            <input
+                              type="number"
+                              value={downPayment}
+                              onChange={(e) => handleInputChange(e, setDownPayment)}
+                              onBlur={calculateAffordability}
+                              className="block w-full pl-7 pr-12 py-2 border border-primary/20 rounded-lg focus:ring-primary focus:border-primary"
+                              placeholder="0"
+                            />
+                          </div>
+                          <div className="mt-1 text-xs text-gray-500">VA loans often require 0% down payment</div>
+                        </div>
+                        
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">Interest Rate (%)</label>
+                          <div className="relative">
+                            <input
+                              type="number"
+                              value={interestRate}
+                              onChange={(e) => handleInputChange(e, setInterestRate)}
+                              onBlur={calculateAffordability}
+                              className="block w-full pr-12 py-2 border border-primary/20 rounded-lg focus:ring-primary focus:border-primary"
+                              placeholder="0"
+                              step="0.1"
+                            />
+                            <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                              <span className="text-gray-500 sm:text-sm">%</span>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                      
-                      <div className="mt-8 grid grid-cols-2 gap-4">
-                        <div className="bg-gray-50 rounded-lg p-4 text-center">
-                          <span className="text-lg font-semibold text-gray-900">{loanTerm} years</span>
-                          <p className="text-xs text-gray-500 mt-1">Loan Term</p>
-                        </div>
-                        <div className="bg-gray-50 rounded-lg p-4 text-center">
-                          <span className="text-lg font-semibold text-gray-900">{interestRate}%</span>
-                          <p className="text-xs text-gray-500 mt-1">Interest Rate</p>
-                        </div>
+                        
+                        <button
+                          onClick={calculateAffordability}
+                          className="w-full py-2 px-4 bg-gradient-to-r from-primary to-primary-dark text-white rounded-lg hover:from-primary-dark hover:to-primary transition duration-200 shadow-md flex items-center justify-center space-x-2 group"
+                        >
+                          <i className="fas fa-home group-hover:animate-bounce-subtle"></i>
+                          <span>Calculate Affordability</span>
+                        </button>
                       </div>
                     </div>
                     
-                    <div className="space-y-3 text-sm flex-grow">
-                      <div className="flex justify-between pb-3 border-b border-gray-100">
-                        <span className="text-gray-600">Principal & Interest:</span>
-                        <span className="font-medium">{formatCurrency(monthlyPayment)}</span>
-                      </div>
+                    <div className="bg-gradient-to-br from-gray-50 to-white rounded-xl p-6 border border-primary/10 shadow-inner flex flex-col justify-center items-center relative overflow-hidden">
+                      {/* Decorative background elements */}
+                      <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-primary/5 to-transparent rounded-bl-[100px]"></div>
+                      <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-secondary/5 to-transparent rounded-tr-[100px]"></div>
                       
-                      <div className="flex justify-between pb-3 border-b border-gray-100">
-                        <span className="text-gray-600">Property Taxes (est.):</span>
-                        <span className="font-medium">{formatCurrency(loanAmount * 0.012 / 12)}</span>
-                      </div>
-                      
-                      <div className="flex justify-between pb-3 border-b border-gray-100">
-                        <span className="text-gray-600">Homeowners Insurance (est.):</span>
-                        <span className="font-medium">{formatCurrency(loanAmount * 0.0035 / 12)}</span>
-                      </div>
-                      
-                      <div className="flex justify-between pt-2">
-                        <span className="text-gray-700 font-medium">Total Monthly Cost:</span>
-                        <span className="font-bold">{formatCurrency(monthlyPayment + (loanAmount * 0.012 / 12) + (loanAmount * 0.0035 / 12))}</span>
-                      </div>
-                      
-                      <div className="flex justify-between pt-4 mt-4 border-t border-gray-100">
-                        <span className="text-gray-700 font-medium">Total Cost Over {loanTerm} Years:</span>
-                        <span className="font-bold">{formatCurrency(totalCost)}</span>
-                      </div>
-                    </div>
-                    
-                    <div className="mt-6">
-                      <div className="bg-gray-50 rounded-lg p-4 mb-4">
-                        <div className="flex items-center">
-                          <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center mr-3">
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                          </div>
-                          <p className="text-xs text-gray-600">
-                            <strong>Pro Tip:</strong> VA loans don't require private mortgage insurance (PMI), saving you approximately {formatCurrency(loanAmount * 0.005 / 12)} per month compared to conventional loans with less than 20% down.
-                          </p>
+                      <h3 className="text-xl font-semibold text-gray-900 mb-6 flex items-center">
+                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-secondary to-secondary-dark text-white flex items-center justify-center mr-2">
+                          <i className="fas fa-home text-xs"></i>
                         </div>
+                        Home Price Range
+                      </h3>
+                      
+                      <div className="text-5xl font-bold text-primary mb-4 relative">
+                        {/* Subtle glow effect */}
+                        <div className="absolute inset-0 bg-primary/5 blur-xl rounded-full"></div>
+                        {formatCurrency(affordableAmount)}
                       </div>
                       
-                      <button className="w-full px-4 py-3 bg-gradient-to-r from-primary to-primary-dark text-white text-sm font-medium rounded-lg transition-all duration-300 transform hover:scale-[1.02] shadow-md hover:shadow-lg flex items-center justify-center">
-                        Get Pre-Approved
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                        </svg>
-                      </button>
-                    </div>
-                  </>
-                ) : (
-                  <>
-                    <div className="mb-8">
-                      <div className="text-center">
-                        <div className="relative inline-block">
-                          <div className="absolute inset-0 bg-primary/10 rounded-full blur-xl transform scale-110"></div>
-                          <div className="relative bg-white rounded-full p-6 border-2 border-primary/20 shadow-lg">
-                            <span className="text-4xl font-bold text-primary">{formatCurrency(affordableAmount)}</span>
-                            <p className="text-sm text-gray-500 mt-1">Home Price Range</p>
-                          </div>
-                        </div>
-                      </div>
+                      <div className="text-sm text-gray-500 mb-6">Maximum affordable home price</div>
                       
-                      <div className="mt-8 grid grid-cols-2 gap-4">
-                        <div className="bg-gray-50 rounded-lg p-4 text-center">
-                          <span className="text-lg font-semibold text-gray-900">{formatCurrency(affordableAmount - downPayment)}</span>
-                          <p className="text-xs text-gray-500 mt-1">Loan Amount</p>
+                      <div className="w-full space-y-3">
+                        <div className="flex justify-between text-sm">
+                          <span className="text-gray-600">Loan Amount</span>
+                          <span className="font-medium">{formatCurrency(affordableAmount - downPayment)}</span>
                         </div>
-                        <div className="bg-gray-50 rounded-lg p-4 text-center">
-                          <span className="text-lg font-semibold text-gray-900">{formatCurrency((affordableAmount - downPayment) * (5.5 / 100 / 12) * Math.pow(1 + (5.5 / 100 / 12), 360) / (Math.pow(1 + (5.5 / 100 / 12), 360) - 1))}</span>
-                          <p className="text-xs text-gray-500 mt-1">Monthly Payment</p>
+                        <div className="flex justify-between text-sm">
+                          <span className="text-gray-600">Down Payment</span>
+                          <span className="font-medium">{formatCurrency(downPayment)}</span>
+                        </div>
+                        <div className="flex justify-between text-sm">
+                          <span className="text-gray-600">Monthly Payment</span>
+                          <span className="font-medium">{formatCurrency(income * 0.28)}</span>
+                        </div>
+                        <div className="h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent my-2"></div>
+                        <div className="flex justify-between text-sm font-semibold">
+                          <span className="text-gray-800">Debt-to-Income Ratio</span>
+                          <span>{Math.round(((income * 0.28) + debts) / income * 100)}%</span>
                         </div>
                       </div>
                     </div>
-                    
-                    <div className="space-y-3 text-sm flex-grow">
-                      <div className="flex justify-between pb-3 border-b border-gray-100">
-                        <span className="text-gray-600">Annual Income:</span>
-                        <span className="font-medium">{formatCurrency(annualIncome)}</span>
-                      </div>
-                      
-                      <div className="flex justify-between pb-3 border-b border-gray-100">
-                        <span className="text-gray-600">Monthly Debts:</span>
-                        <span className="font-medium">{formatCurrency(monthlyDebts)}</span>
-                      </div>
-                      
-                      <div className="flex justify-between pb-3 border-b border-gray-100">
-                        <span className="text-gray-600">Down Payment:</span>
-                        <span className="font-medium">{formatCurrency(downPayment)}</span>
-                      </div>
-                      
-                      <div className="flex justify-between pb-3 border-b border-gray-100">
-                        <span className="text-gray-600">Monthly Housing Budget:</span>
-                        <span className="font-medium">{formatCurrency((annualIncome / 12) * 0.41 - monthlyDebts)}</span>
-                      </div>
-                      
-                      <div className="flex justify-between pt-2">
-                        <span className="text-gray-700 font-medium">Loan Amount:</span>
-                        <span className="font-bold">{formatCurrency(affordableAmount - downPayment)}</span>
-                      </div>
-                    </div>
-                    
-                    <div className="mt-6">
-                      <div className="bg-gray-50 rounded-lg p-4 mb-4">
-                        <div className="flex items-center">
-                          <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center mr-3">
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                          </div>
-                          <p className="text-xs text-gray-600">
-                            <strong>Pro Tip:</strong> VA loans often allow for a higher debt-to-income ratio than conventional loans, helping you qualify for more home with the same income.
-                          </p>
-                        </div>
-                      </div>
-                      
-                      <button className="w-full px-4 py-3 bg-gradient-to-r from-primary to-primary-dark text-white text-sm font-medium rounded-lg transition-all duration-300 transform hover:scale-[1.02] shadow-md hover:shadow-lg flex items-center justify-center">
-                        Find Homes In Your Range
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                        </svg>
-                      </button>
-                    </div>
-                  </>
-                )}
-              </div>
-            </div>
-          </div>
+                  </div>
+                </div>
+              </Tab.Panel>
+            </Tab.Panels>
+          </Tab.Group>
         </div>
       </div>
     </section>

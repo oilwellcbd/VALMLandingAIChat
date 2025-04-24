@@ -40,7 +40,7 @@ const LoanOptions = () => {
       {
         id: 'standard',
         title: 'Standard Purchase Loan',
-        icon: 'fa-home',
+        icon: 'fa-house-chimney',
         description: 'The traditional VA home loan for purchasing a primary residence with competitive rates and no down payment required.',
         features: [
           'No down payment required',
@@ -64,7 +64,7 @@ const LoanOptions = () => {
       {
         id: 'jumbo',
         title: 'Jumbo VA Loan',
-        icon: 'fa-dollar-sign',
+        icon: 'fa-building-columns',
         description: 'For higher-priced homes that exceed the standard VA loan limits in your county. Perfect for luxury properties and high-cost areas.',
         features: [
           'Higher loan amounts available',
@@ -90,7 +90,7 @@ const LoanOptions = () => {
       {
         id: 'irrrl',
         title: 'Interest Rate Reduction Refinance Loan (IRRRL)',
-        icon: 'fa-percentage',
+        icon: 'fa-chart-line',
         description: 'Also known as the VA Streamline Refinance, this option allows you to refinance an existing VA loan with minimal paperwork and hassle.',
         features: [
           'No appraisal required in most cases',
@@ -114,7 +114,7 @@ const LoanOptions = () => {
       {
         id: 'cashout',
         title: 'Cash-Out Refinance',
-        icon: 'fa-money-bill-wave',
+        icon: 'fa-sack-dollar',
         description: 'Access your home\'s equity for debt consolidation, home improvements, or other financial needs. Turn your home\'s value into usable funds.',
         features: [
           'Refinance up to 100% of your home\'s value',
@@ -140,7 +140,7 @@ const LoanOptions = () => {
       {
         id: 'nadl',
         title: 'Native American Direct Loan (NADL)',
-        icon: 'fa-landmark',
+        icon: 'fa-mountain-sun',
         description: 'Specialized loans for Native American Veterans to purchase, construct, or improve homes on Federal Trust Land. Offers unique benefits for eligible borrowers.',
         features: [
           'Direct loan from the VA (not a private lender)',
@@ -164,7 +164,7 @@ const LoanOptions = () => {
       {
         id: 'adapted',
         title: 'Specially Adapted Housing (SAH) Grant',
-        icon: 'fa-wheelchair',
+        icon: 'fa-house-medical',
         description: 'Financial assistance for Veterans with certain service-connected disabilities to build, remodel, or purchase an adapted home. Supports independent living.',
         features: [
           'Grant (not a loan) up to $101,754 (2025)',
@@ -190,18 +190,48 @@ const LoanOptions = () => {
 
   return (
     <section id="loan-options" className="py-24 relative bg-white">
-      {/* Background elements */}
+      {/* Premium background with gradient and pattern */}
+      <div className="absolute inset-0 bg-gradient-to-br from-gray-50 via-white to-gray-50"></div>
       <div className="absolute inset-0 bg-[url('/images/backgrounds/hero-pattern.svg')] bg-repeat opacity-5"></div>
       <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary via-secondary to-primary"></div>
       
+      {/* Decorative elements */}
+      <div className="absolute top-0 right-0 w-1/3 h-1/3 bg-gradient-to-b from-primary/5 to-transparent rounded-bl-[100px] z-0"></div>
+      <div className="absolute bottom-0 left-0 w-1/4 h-1/4 bg-gradient-to-t from-secondary/5 to-transparent rounded-tr-[100px] z-0"></div>
+      
+      {/* Floating particles */}
+      <div className="absolute top-1/4 left-1/4 w-4 h-4 rounded-full bg-primary opacity-20 animate-float"></div>
+      <div className="absolute top-3/4 right-1/4 w-6 h-6 rounded-full bg-secondary opacity-10 animate-float-slow"></div>
+      <div className="absolute top-1/2 left-3/4 w-3 h-3 rounded-full bg-blue-400 opacity-15 animate-float-reverse"></div>
+      
+      {/* Additional particles */}
+      <div className="absolute top-1/3 right-1/3 w-5 h-5 rounded-full bg-primary opacity-10 animate-float-reverse"></div>
+      <div className="absolute top-2/3 left-1/5 w-4 h-4 rounded-full bg-secondary opacity-15 animate-float"></div>
+      <div className="absolute top-1/6 right-1/6 w-3 h-3 rounded-full bg-blue-400 opacity-10 animate-float-slow"></div>
+      <div className="absolute bottom-1/4 left-1/3 w-6 h-6 rounded-full bg-primary opacity-5 animate-float"></div>
+      <div className="absolute top-2/5 right-2/5 w-8 h-8 rounded-full bg-secondary opacity-5 animate-float-slow"></div>
+      
+      {/* Geometric shapes */}
+      <div className="absolute top-1/6 left-1/6 w-12 h-12 border-2 border-primary/10 rounded-lg rotate-45 opacity-20 animate-float-slow"></div>
+      <div className="absolute bottom-1/6 right-1/6 w-16 h-16 border-2 border-secondary/10 rounded-lg rotate-12 opacity-15 animate-float-reverse"></div>
+      <div className="absolute top-3/5 left-2/5 w-10 h-10 border-2 border-blue-400/10 rounded-full opacity-10 animate-float"></div>
+      
       <div className="container mx-auto px-4 relative z-10">
         <div className="max-w-3xl mx-auto text-center mb-16">
-          <div className="inline-block px-3 py-1 bg-primary/10 rounded-full text-primary text-xs font-medium tracking-wider uppercase mb-3">
+          <div className="inline-block px-4 py-1.5 bg-primary/10 rounded-full text-primary text-sm font-medium tracking-wider uppercase mb-4 border border-primary/20">
             Financing Options
           </div>
-          <h2 className="text-3xl font-bold text-gray-900 mb-4">VA Loan Options</h2>
-          <div className="w-16 h-1 bg-secondary mx-auto mb-4"></div>
-          <p className="text-gray-600">Explore our range of VA loan programs designed to meet your specific needs</p>
+          <h2 className="text-4xl font-bold text-gray-900 mb-6">VA Loan Options</h2>
+          
+          {/* Enhanced divider */}
+          <div className="relative flex items-center justify-center mb-6">
+            <div className="w-24 h-1 bg-gradient-to-r from-transparent via-secondary to-transparent"></div>
+            <div className="absolute w-12 h-1 bg-secondary mx-auto animate-pulse"></div>
+          </div>
+          
+          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+            Explore our range of VA loan programs designed to meet your specific needs
+          </p>
         </div>
         
         {/* Tabs */}
@@ -209,28 +239,43 @@ const LoanOptions = () => {
           <div className="flex flex-wrap justify-center">
             <div className="bg-white p-1.5 rounded-full shadow-md flex space-x-1 border border-gray-100">
               <button
-                className={`px-6 py-2.5 rounded-full transition-all duration-300 text-sm font-medium ${
-                  activeTab === 'purchase' ? 'bg-primary text-white shadow-sm' : 'text-gray-600 hover:bg-gray-100'
+                className={`px-6 py-3 rounded-full transition-all duration-300 text-sm font-medium ${
+                  activeTab === 'purchase' 
+                    ? 'bg-gradient-to-r from-primary to-primary-dark text-white shadow-sm' 
+                    : 'text-gray-600 hover:bg-gray-50'
                 }`}
                 onClick={() => handleTabChange('purchase')}
               >
-                Purchase Loans
+                <span className="flex items-center">
+                  <i className="fas fa-home mr-2"></i>
+                  Purchase Loans
+                </span>
               </button>
               <button
-                className={`px-6 py-2.5 rounded-full transition-all duration-300 text-sm font-medium ${
-                  activeTab === 'refinance' ? 'bg-primary text-white shadow-sm' : 'text-gray-600 hover:bg-gray-100'
+                className={`px-6 py-3 rounded-full transition-all duration-300 text-sm font-medium ${
+                  activeTab === 'refinance' 
+                    ? 'bg-gradient-to-r from-primary to-primary-dark text-white shadow-sm' 
+                    : 'text-gray-600 hover:bg-gray-50'
                 }`}
                 onClick={() => handleTabChange('refinance')}
               >
-                Refinance Loans
+                <span className="flex items-center">
+                  <i className="fas fa-sync-alt mr-2"></i>
+                  Refinance Loans
+                </span>
               </button>
               <button
-                className={`px-6 py-2.5 rounded-full transition-all duration-300 text-sm font-medium ${
-                  activeTab === 'special' ? 'bg-primary text-white shadow-sm' : 'text-gray-600 hover:bg-gray-100'
+                className={`px-6 py-3 rounded-full transition-all duration-300 text-sm font-medium ${
+                  activeTab === 'special' 
+                    ? 'bg-gradient-to-r from-primary to-primary-dark text-white shadow-sm' 
+                    : 'text-gray-600 hover:bg-gray-50'
                 }`}
                 onClick={() => handleTabChange('special')}
               >
-                Specialized Programs
+                <span className="flex items-center">
+                  <i className="fas fa-star mr-2"></i>
+                  Specialized Programs
+                </span>
               </button>
             </div>
           </div>
@@ -249,8 +294,25 @@ const LoanOptions = () => {
                   <div className={`absolute top-0 left-0 w-full h-1 bg-gradient-to-r ${idx % 2 === 0 ? 'from-primary to-primary-light' : 'from-secondary to-secondary-light'}`}></div>
                   
                   <div className="flex items-center mb-4">
-                    <div className={`w-12 h-12 rounded-lg ${idx % 2 === 0 ? 'bg-primary/10 text-primary' : 'bg-secondary/10 text-secondary'} flex items-center justify-center mr-4 transition-all duration-300 group-hover:bg-white`}>
-                      <i className={`fas ${option.icon} text-lg`}></i>
+                    <div className={`relative w-16 h-16 rounded-2xl ${idx % 2 === 0 ? 'bg-primary/10' : 'bg-secondary/10'} flex items-center justify-center mr-4 transition-all duration-300 group-hover:shadow-lg border border-gray-100 group-hover:border-${idx % 2 === 0 ? 'primary' : 'secondary'}/20 overflow-hidden`}>
+                      {/* Glowing accent in corner */}
+                      <div className={`absolute -top-8 -right-8 w-16 h-16 ${idx % 2 === 0 ? 'bg-primary' : 'bg-secondary'} rounded-full opacity-0 group-hover:opacity-20 blur-xl transition-all duration-500 transform group-hover:scale-150`}></div>
+                      
+                      {/* Decorative elements */}
+                      <div className="absolute top-0 left-0 w-full h-full">
+                        <div className={`absolute top-1 right-1 w-2 h-2 rounded-full ${idx % 2 === 0 ? 'bg-primary' : 'bg-secondary'} opacity-30`}></div>
+                        <div className={`absolute bottom-1 left-1 w-2 h-2 rounded-full ${idx % 2 === 0 ? 'bg-primary' : 'bg-secondary'} opacity-30`}></div>
+                        <div className={`absolute top-1 left-1 w-1 h-1 rounded-full ${idx % 2 === 0 ? 'bg-primary' : 'bg-secondary'} opacity-20`}></div>
+                        <div className={`absolute bottom-1 right-1 w-1 h-1 rounded-full ${idx % 2 === 0 ? 'bg-primary' : 'bg-secondary'} opacity-20`}></div>
+                      </div>
+                      
+                      {/* Icon with animated scaling on hover */}
+                      <div className="relative z-10 transform transition-transform duration-300 group-hover:scale-110">
+                        <i className={`fas ${option.icon} text-xl ${idx % 2 === 0 ? 'text-primary' : 'text-secondary'}`}></i>
+                      </div>
+                      
+                      {/* Subtle gradient overlay */}
+                      <div className={`absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300`}></div>
                     </div>
                     <h3 className="text-xl font-semibold text-gray-900">{option.title}</h3>
                   </div>
@@ -260,8 +322,8 @@ const LoanOptions = () => {
                   {option.stats && (
                     <div className="grid grid-cols-3 gap-2 mt-4">
                       {option.stats.map((stat, index) => (
-                        <div key={index} className="text-center">
-                          <div className={`text-sm font-bold ${stat.highlight ? (idx % 2 === 0 ? 'text-primary' : 'text-secondary') : 'text-gray-700'}`}>
+                        <div key={index} className="text-center group">
+                          <div className={`text-sm font-bold transition-all duration-300 ${stat.highlight ? (idx % 2 === 0 ? 'text-primary group-hover:text-primary-dark' : 'text-secondary group-hover:text-secondary-dark') : 'text-gray-700'}`}>
                             {stat.value}
                           </div>
                           <div className="text-xs text-gray-500">{stat.label}</div>
