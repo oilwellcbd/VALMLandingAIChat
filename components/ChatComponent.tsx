@@ -241,17 +241,19 @@ const ChatComponent = () => {
         <div ref={messagesEndRef} style={{ height: '1px', opacity: 0 }} />
       </div>
 
-      {/* Input area with enhanced glossy styling */}
+      {/* Input area with premium, standout styling */}
       <div className="p-5 border-t border-gray-200 bg-gradient-to-b from-white to-gray-50 relative overflow-hidden">
-        {/* Glossy overlay */}
+        {/* Premium background effect */}
         <div className="absolute inset-0 bg-gradient-to-b from-white/80 via-white/40 to-white/10 pointer-events-none z-10"></div>
-        <div className="absolute inset-0 bg-gradient-to-tr from-primary/5 to-secondary/5 pointer-events-none z-0"></div>
+        <div className="absolute inset-0 bg-gradient-to-tr from-primary/10 to-secondary/10 pointer-events-none z-0"></div>
+        
+        {/* Subtle accent lines */}
         <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent"></div>
         
         {/* Shine effect */}
         <div className="absolute -inset-full w-[200%] h-[200%] bg-gradient-to-r from-transparent via-white/50 to-transparent skew-x-12 animate-shine pointer-events-none z-20"></div>
         
-        {/* Content with relative positioning to appear above the glossy effects */}
+        {/* Content with relative positioning to appear above the effects */}
         <div className="relative z-30">
           {/* Simplified quick questions - just two key ones positioned elegantly */}
           <div className="flex justify-end mb-3">
@@ -269,7 +271,7 @@ const ChatComponent = () => {
             ))}
           </div>
 
-          {/* Message input with enhanced styling */}
+          {/* Message input with premium styling */}
           <form onSubmit={handleSendMessage} className="flex items-end gap-3">
             <div className="relative flex-1 group">
               {/* Enhanced glow effect for input - contained within the input boundaries */}
@@ -293,10 +295,6 @@ const ChatComponent = () => {
                 className="w-full border-3 border-primary/40 focus:border-primary focus:ring-4 focus:ring-primary/30 rounded-full py-5 pl-7 pr-14 text-sm transition-all duration-300 shadow-lg group-hover:shadow-xl relative z-10 bg-white"
                 disabled={isTyping}
               />
-              
-              {/* Decorative elements */}
-              <div className="absolute left-0 top-1/2 -translate-y-1/2 w-2 h-10 bg-gradient-to-b from-primary to-secondary rounded-r-full transform -translate-x-1 opacity-0 group-hover:opacity-100 transition-all duration-500 z-20"></div>
-              <div className="absolute right-0 top-1/2 -translate-y-1/2 w-2 h-10 bg-gradient-to-b from-secondary to-primary rounded-l-full transform translate-x-1 opacity-0 group-hover:opacity-100 transition-all duration-500 z-20"></div>
               
               {inputValue.length > 0 && (
                 <button
@@ -322,27 +320,29 @@ const ChatComponent = () => {
             </div>
             
             <div className="relative group">
-              {/* Glow effect for button */}
-              <div className="absolute -inset-1 bg-gradient-to-r from-primary/50 to-primary-dark/50 rounded-full blur opacity-0 group-hover:opacity-100 transition duration-500"></div>
+              {/* Premium button glow effect */}
+              <div className="absolute -inset-2 bg-gradient-to-r from-primary/50 via-secondary/50 to-primary-dark/50 rounded-full blur-lg opacity-0 group-hover:opacity-100 transition duration-500"></div>
               
               <button
                 type="submit"
                 disabled={!inputValue.trim() || isTyping}
                 className={`
-                  relative z-10 rounded-full w-12 h-12 flex items-center justify-center transition-all duration-300
+                  relative z-10 rounded-full w-14 h-14 flex items-center justify-center transition-all duration-300
                   ${!inputValue.trim() || isTyping 
                     ? 'bg-gray-200 text-gray-400 cursor-not-allowed' 
-                    : 'bg-gradient-to-r from-primary to-primary-dark text-white hover:shadow-lg transform group-hover:scale-105'}
+                    : 'bg-gradient-to-r from-primary via-secondary to-primary-dark text-white shadow-lg hover:shadow-xl transform group-hover:scale-105'}
                 `}
               >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                {/* Premium send icon */}
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="22" y1="2" x2="11" y2="13"></line>
+                  <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
                 </svg>
               </button>
             </div>
           </form>
           
-          {/* Powered by indicator */}
+          {/* Powered by indicator with futuristic styling */}
           <div className="mt-2 text-center">
             <p className="text-xs text-gray-400 flex items-center justify-center">
               <span className="w-1.5 h-1.5 bg-green-400 rounded-full mr-1 animate-pulse"></span>

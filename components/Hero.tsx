@@ -241,6 +241,11 @@ const Hero = () => {
               <div className="absolute -top-3 -right-3 w-6 h-6 border-2 border-secondary rounded-full animate-ping opacity-70"></div>
               <div className="absolute -bottom-3 -left-3 w-6 h-6 border-2 border-primary rounded-full animate-ping opacity-70" style={{ animationDelay: '1s' }}></div>
               
+              {/* Futuristic device elements */}
+              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-20 h-1 bg-gradient-to-r from-primary/30 via-white/80 to-primary/30 rounded-full"></div>
+              <div className="absolute -left-1 top-1/3 w-1 h-16 bg-gradient-to-b from-primary/0 via-primary/40 to-primary/0 rounded-full"></div>
+              <div className="absolute -right-1 top-1/3 w-1 h-16 bg-gradient-to-b from-primary/0 via-primary/40 to-primary/0 rounded-full"></div>
+              
               {/* Chat component */}
               <div className="relative bg-white rounded-2xl shadow-2xl overflow-hidden border border-primary/20 transition-all duration-500 hover:shadow-primary/20 hover:shadow-lg">
                 <div className="flex flex-col h-[700px] relative">
@@ -249,14 +254,6 @@ const Hero = () => {
                     <div className="w-2.5 h-2.5 bg-green-400 rounded-full mr-2 animate-pulse"></div>
                     <span className="mr-1">VA Loan Expert</span>
                     <span className="text-xs bg-white/20 px-1.5 py-0.5 rounded-full">ONLINE</span>
-                  </div>
-                  
-                  {/* "Chat with me" floating indicator */}
-                  <div className="absolute -left-3 top-1/4 bg-secondary text-white px-3 py-2 rounded-r-lg shadow-lg z-20 flex items-center animate-bounce-slow">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
-                    </svg>
-                    <span className="font-medium">Chat with me!</span>
                   </div>
                   
                   <ChatComponent />
