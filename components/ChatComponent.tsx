@@ -21,7 +21,7 @@ const ChatComponent = () => {
       timestamp: new Date()
     }
   ]);
-  const [input, setInput] = useState('');
+  const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isThinking, setIsThinking] = useState(false);
   const [showModelInfo, setShowModelInfo] = useState(false);
@@ -29,12 +29,10 @@ const ChatComponent = () => {
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const [isTyping, setIsTyping] = useState(false);
 
-  // Sample quick questions
-  const quickQuestions = [
+  // Selected top two most important quick questions
+  const topQuickQuestions = [
     "Am I eligible for a VA loan?",
-    "What are VA loan benefits?",
-    "How much can I borrow?",
-    "What's the VA funding fee?"
+    "What are VA loan benefits?"
   ];
 
   // Scroll to bottom of chat when messages change
@@ -48,7 +46,7 @@ const ChatComponent = () => {
       inputRef.current.style.height = 'auto';
       inputRef.current.style.height = `${inputRef.current.scrollHeight}px`;
     }
-  }, [input]);
+  }, [inputValue]);
 
   // Simulate typing effect for the assistant
   const simulateTyping = (response: string, callback: (text: string) => void) => {
@@ -77,7 +75,7 @@ const ChatComponent = () => {
   };
 
   // Handle sending a new message
-  const handleSendMessage = async (e: React.FormEvent, messageText: string = input) => {
+  const handleSendMessage = async (e: React.FormEvent, messageText: string = inputValue) => {
     e.preventDefault();
     
     if (!messageText.trim()) return;
@@ -90,7 +88,7 @@ const ChatComponent = () => {
     };
     
     setMessages(prev => [...prev, userMessage]);
-    setInput('');
+    setInputValue('');
     setIsLoading(true);
     
     // First show thinking animation
@@ -139,10 +137,10 @@ const ChatComponent = () => {
     }
   };
 
-  // Function to handle clicking a quick question
-  const handleQuickQuestion = (question: string, e: React.MouseEvent) => {
-    e.preventDefault();
-    handleSendMessage(e as unknown as React.FormEvent, question);
+  // Handle quick question selection
+  const handleQuickQuestion = (question: string, e?: React.MouseEvent) => {
+    if (e) e.preventDefault();
+    handleSendMessage(new Event('submit') as unknown as React.FormEvent, question);
   };
 
   // Format timestamp
@@ -153,125 +151,201 @@ const ChatComponent = () => {
 
   return (
     <div className="flex flex-col h-full">
-      {/* Chat messages area */}
-      <div className="flex-1 p-4 pt-10 overflow-y-auto bg-gradient-to-b from-primary/5 to-white">
-        <div className="space-y-4">
-          {messages.map((message, index) => (
-            <div key={index} className={`relative ${message.role === 'user' ? 'ml-4 mr-0' : 'ml-0 mr-4'}`}>
-              <div className="flex items-end mb-4 mt-4">
-                {message.role === 'assistant' && (
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-primary-dark mr-2 flex-shrink-0 flex items-center justify-center overflow-hidden">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+      {/* Chat messages area with subtle background pattern */}
+      <div 
+        className="flex-1 p-6 pt-10 overflow-y-auto scrollbar-thin scrollbar-thumb-primary/30 scrollbar-track-gray-100"
+        style={{
+          backgroundImage: 'radial-gradient(rgba(99, 102, 241, 0.05) 1px, transparent 1px)',
+          backgroundSize: '20px 20px'
+        }}
+      >
+        {messages.map((message, index) => (
+          <div 
+            key={index} 
+            className={`mb-4 ${message.role === 'assistant' ? 'mr-8' : 'ml-8'} animate-fade-in`}
+            style={{ animationDelay: `${index * 0.1}s` }}
+          >
+            <div className={`flex items-start ${message.role === 'assistant' ? '' : 'flex-row-reverse'}`}>
+              {/* Avatar */}
+              <div className={`flex-shrink-0 ${message.role === 'assistant' ? 'mr-3' : 'ml-3'}`}>
+                {message.role === 'assistant' ? (
+                  <div className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center relative">
+                    <span className="text-xs font-bold">AI</span>
+                    <div className="absolute -right-1 -top-1 w-3 h-3 bg-green-400 rounded-full border-2 border-white"></div>
+                  </div>
+                ) : (
+                  <div className="w-8 h-8 rounded-full bg-gray-200 text-gray-600 flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
                     </svg>
                   </div>
                 )}
-                
-                <div 
-                  className={`${
-                    message.role === 'user' 
-                      ? 'bg-primary/10 rounded-t-lg rounded-bl-lg ml-auto' 
-                      : 'bg-white rounded-t-lg rounded-br-lg'
-                  } p-3 shadow-md max-w-[80%] border ${message.role === 'user' ? 'border-primary/20' : 'border-gray-100'}`}
-                >
-                  <div className="text-sm prose prose-sm max-w-none">
-                    {message.role === 'assistant' ? (
-                      <ReactMarkdown>{message.content}</ReactMarkdown>
-                    ) : (
-                      <p>{message.content}</p>
-                    )}
+              </div>
+              
+              {/* Message bubble */}
+              <div 
+                className={`
+                  relative p-4 rounded-xl max-w-[85%] shadow-md
+                  ${message.role === 'assistant' 
+                    ? 'bg-white border border-primary/20 text-gray-800 backdrop-blur-sm bg-opacity-95' 
+                    : 'bg-gradient-to-br from-primary to-primary-dark text-white'}
+                  transition-all duration-300 hover:shadow-lg
+                `}
+              >
+                {/* Typing indicator for AI's last message */}
+                {message.role === 'assistant' && index === messages.length - 1 && isTyping ? (
+                  <div className="flex items-center space-x-1">
+                    <div className="w-2 h-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: '0s' }}></div>
+                    <div className="w-2 h-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                    <div className="w-2 h-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: '0.4s' }}></div>
                   </div>
-                </div>
-                
-                {message.timestamp && (
-                  <div className={`${message.role === 'user' ? 'mr-2' : 'ml-2'} text-xs text-gray-500 self-end mb-1`}>
-                    {formatTime(message.timestamp)}
-                  </div>
+                ) : (
+                  <p className="text-sm whitespace-pre-wrap">{message.content}</p>
                 )}
-              </div>
-            </div>
-          ))}
-          
-          {/* Thinking animation */}
-          {isThinking && (
-            <div className="flex items-center mb-4 mt-4">
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-primary-dark mr-2 flex-shrink-0 flex items-center justify-center">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
-                </svg>
-              </div>
-              <div className="bg-white p-3 rounded-lg shadow-md">
-                <div className="flex space-x-2">
-                  <div className="w-2 h-2 bg-primary/60 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
-                  <div className="w-2 h-2 bg-primary/60 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
-                  <div className="w-2 h-2 bg-primary/60 rounded-full animate-bounce" style={{ animationDelay: '600ms' }}></div>
+                
+                {/* Message time */}
+                <div 
+                  className={`
+                    text-[10px] absolute bottom-1 ${message.role === 'assistant' ? 'right-2' : 'left-2'}
+                    ${message.role === 'assistant' ? 'text-gray-400' : 'text-white/70'}
+                  `}
+                >
+                  {formatTime(message.timestamp)}
                 </div>
               </div>
-            </div>
-          )}
-          
-          <div ref={messagesEndRef}></div>
-        </div>
-      </div>
-      
-      {/* Input area */}
-      <div className="px-4 py-3 bg-gradient-to-r from-primary/5 to-secondary/5">
-        {/* Quick questions */}
-        <p className="text-sm text-gray-600 mb-2 font-medium">Ask me about:</p>
-        <div className="flex flex-wrap gap-2 mb-4">
-          {quickQuestions.map((question, index) => (
-            <button
-              key={index}
-              className="bg-white border border-primary/20 rounded-full px-3 py-1.5 text-sm text-gray-700 hover:bg-primary/5 transition-colors duration-200 shadow-sm"
-              onClick={(e) => handleQuickQuestion(question, e)}
-              disabled={isLoading}
-            >
-              {question}
-            </button>
-          ))}
-        </div>
-        
-        {/* Message input */}
-        <form onSubmit={handleSendMessage} className="flex items-end gap-2">
-          <div className="relative flex-1">
-            <textarea
-              ref={inputRef}
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              placeholder="Type your question..."
-              className="w-full border border-gray-200 rounded-lg py-2 pl-3 pr-10 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-transparent resize-none max-h-32 text-sm"
-              rows={1}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                  e.preventDefault();
-                  if (!isLoading && input.trim()) {
-                    handleSendMessage(e);
-                  }
-                }
-              }}
-              disabled={isLoading}
-            />
-            <div className="absolute right-2 bottom-2">
-              {isTyping && (
-                <div className="text-xs text-gray-500 italic">Typing...</div>
-              )}
             </div>
           </div>
-          <button
-            type="submit"
-            disabled={isLoading || !input.trim()}
-            className="bg-gradient-to-r from-primary to-primary-dark text-white rounded-full w-10 h-10 flex items-center justify-center hover:from-primary-dark hover:to-primary disabled:opacity-50 disabled:cursor-not-allowed shadow-md"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-              <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" />
-            </svg>
-          </button>
-        </form>
-        <div className="mt-2 text-xs text-center text-gray-500">
-          <span className="flex items-center justify-center">
-            <span className="inline-block w-1.5 h-1.5 bg-green-500 rounded-full mr-1"></span>
-            VA Loan Expert • <span className="text-primary hover:underline cursor-pointer">Privacy Policy</span>
-          </span>
+        ))}
+        
+        {/* Empty state with animated prompt */}
+        {messages.length === 0 && (
+          <div className="h-full flex flex-col items-center justify-center text-center p-6 animate-fade-in">
+            <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-4 animate-pulse-slow">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+              </svg>
+            </div>
+            <h3 className="text-lg font-semibold text-gray-800 mb-2">VA Loan Expert AI</h3>
+            <p className="text-gray-600 mb-4 max-w-xs">I'm here to answer all your questions about VA loans and help you get started with your application.</p>
+            <div className="animate-bounce-slow">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-primary mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+              </svg>
+            </div>
+          </div>
+        )}
+        
+        <div ref={messagesEndRef} />
+      </div>
+
+      {/* Input area with enhanced glossy styling */}
+      <div className="p-5 border-t border-gray-200 bg-gradient-to-b from-white to-gray-50 relative overflow-hidden">
+        {/* Glossy overlay */}
+        <div className="absolute inset-0 bg-gradient-to-b from-white/80 via-white/40 to-white/10 pointer-events-none z-10"></div>
+        <div className="absolute inset-0 bg-gradient-to-tr from-primary/5 to-secondary/5 pointer-events-none z-0"></div>
+        <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent"></div>
+        
+        {/* Shine effect */}
+        <div className="absolute -inset-full w-[200%] h-[200%] bg-gradient-to-r from-transparent via-white/50 to-transparent skew-x-12 animate-shine pointer-events-none z-20"></div>
+        
+        {/* Content with relative positioning to appear above the glossy effects */}
+        <div className="relative z-30">
+          {/* Simplified quick questions - just two key ones positioned elegantly */}
+          <div className="flex justify-end mb-3">
+            {topQuickQuestions.map((question, index) => (
+              <button
+                key={index}
+                onClick={() => handleQuickQuestion(question)}
+                className="text-xs bg-white hover:bg-primary hover:text-white text-gray-700 py-1 px-3 rounded-full transition-colors duration-300 border border-gray-200 hover:border-primary flex items-center group shadow-sm hover:shadow ml-2"
+              >
+                <span>{question}</span>
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-2.5 w-2.5 ml-1.5 text-primary group-hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+            ))}
+          </div>
+
+          {/* Message input with enhanced styling */}
+          <form onSubmit={handleSendMessage} className="flex items-end gap-3">
+            <div className="relative flex-1 group">
+              {/* Enhanced glow effect for input - contained within the input boundaries */}
+              <div className="absolute inset-0 bg-gradient-to-r from-primary/30 via-secondary/40 to-primary/30 rounded-full blur-md opacity-0 group-hover:opacity-100 transition duration-500"></div>
+              
+              {/* Floating label effect - positioned to the left to avoid overlap with quick questions */}
+              <div className="absolute -top-5 left-2 px-3 py-1 bg-white text-primary text-xs font-semibold z-20 rounded-full shadow-md border border-primary/30 animate-bounce-slow" style={{ animationDuration: '4s' }}>
+                <span className="flex items-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 mr-1 text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  CHAT WITH VALM
+                </span>
+              </div>
+              
+              <input
+                type="text"
+                value={inputValue}
+                onChange={(e) => setInputValue(e.target.value)}
+                placeholder="Type your question here..."
+                className="w-full border-3 border-primary/40 focus:border-primary focus:ring-4 focus:ring-primary/30 rounded-full py-5 pl-7 pr-14 text-sm transition-all duration-300 shadow-lg group-hover:shadow-xl relative z-10 bg-white"
+                disabled={isTyping}
+              />
+              
+              {/* Decorative elements */}
+              <div className="absolute left-0 top-1/2 -translate-y-1/2 w-2 h-10 bg-gradient-to-b from-primary to-secondary rounded-r-full transform -translate-x-1 opacity-0 group-hover:opacity-100 transition-all duration-500 z-20"></div>
+              <div className="absolute right-0 top-1/2 -translate-y-1/2 w-2 h-10 bg-gradient-to-b from-secondary to-primary rounded-l-full transform translate-x-1 opacity-0 group-hover:opacity-100 transition-all duration-500 z-20"></div>
+              
+              {inputValue.length > 0 && (
+                <button
+                  type="button"
+                  onClick={() => setInputValue('')}
+                  className="absolute right-12 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 z-10"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              )}
+              
+              {/* Animated hint */}
+              {!inputValue.trim() && !isTyping && (
+                <div className="absolute right-12 top-1/2 -translate-y-1/2 flex items-center text-xs text-gray-400 animate-pulse-slow z-10">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  Ask anything
+                </div>
+              )}
+            </div>
+            
+            <div className="relative group">
+              {/* Glow effect for button */}
+              <div className="absolute -inset-1 bg-gradient-to-r from-primary/50 to-primary-dark/50 rounded-full blur opacity-0 group-hover:opacity-100 transition duration-500"></div>
+              
+              <button
+                type="submit"
+                disabled={!inputValue.trim() || isTyping}
+                className={`
+                  relative z-10 rounded-full w-12 h-12 flex items-center justify-center transition-all duration-300
+                  ${!inputValue.trim() || isTyping 
+                    ? 'bg-gray-200 text-gray-400 cursor-not-allowed' 
+                    : 'bg-gradient-to-r from-primary to-primary-dark text-white hover:shadow-lg transform group-hover:scale-105'}
+                `}
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                </svg>
+              </button>
+            </div>
+          </form>
+          
+          {/* Powered by indicator */}
+          <div className="mt-2 text-center">
+            <p className="text-xs text-gray-400 flex items-center justify-center">
+              <span className="w-1.5 h-1.5 bg-green-400 rounded-full mr-1 animate-pulse"></span>
+              Powered by advanced AI technology
+            </p>
+          </div>
         </div>
       </div>
     </div>
