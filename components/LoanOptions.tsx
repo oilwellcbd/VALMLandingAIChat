@@ -113,91 +113,113 @@ const LoanOptions = () => {
           'Native American Veterans',
           'Alaska Native Veterans',
           'Veterans married to Native Americans',
-          'Those buying or building on Federal Trust Land'
+          'Those building on Federal Trust Land'
         ]
       },
       {
         id: 'adapted',
         title: 'Specially Adapted Housing (SAH) Grant',
         icon: 'fa-wheelchair',
-        description: 'Grants for Veterans with certain service-connected disabilities to build, remodel, or purchase an adapted home.',
+        description: 'Financial assistance for Veterans with certain service-connected disabilities to build, remodel, or purchase an adapted home.',
         features: [
-          'Grant (not a loan) up to $101,754 (2023)',
-          'Can be used with a VA loan',
-          'Available for severe service-connected disabilities',
-          'Can be used up to 6 times',
-          'Doesn\'t need to be repaid'
+          'Grant (not a loan) up to $101,754 (2022)',
+          'Can be used multiple times up to maximum amount',
+          'Can be combined with other VA loans',
+          'Doesn\'t need to be repaid',
+          'Specific disability requirements apply'
         ],
         idealFor: [
           'Veterans with severe service-connected disabilities',
           'Those needing wheelchair accessibility',
-          'Veterans with vision or mobility impairments',
-          'Those requiring home modifications for disability'
+          'Veterans with vision or mobility limitations',
+          'Those modifying homes for disability accommodation'
         ]
       }
     ]
   };
 
   return (
-    <section id="loan-options" className="section bg-background">
-      <div className="container">
-        <div className="section-header">
-          <h2 className="text-primary mb-2">VA Loan Options</h2>
-          <p className="text-xl text-gray-600">Find the right loan for your unique situation</p>
+    <section id="loan-options" className="py-16 bg-white relative overflow-hidden">
+      {/* Subtle background pattern */}
+      <div className="absolute inset-0 bg-[url('/images/backgrounds/hero-pattern.svg')] bg-repeat opacity-5"></div>
+      
+      <div className="container mx-auto px-4 relative z-10">
+        <div className="max-w-3xl mx-auto text-center mb-12">
+          <div className="inline-block px-3 py-1 bg-primary/10 rounded-full text-primary text-xs font-medium tracking-wider uppercase mb-3">
+            Financing Solutions
+          </div>
+          <h2 className="text-3xl font-bold text-gray-900 mb-4">VA Loan Options</h2>
+          <div className="w-16 h-1 bg-secondary mx-auto mb-4"></div>
+          <p className="text-gray-600">Specialized mortgage solutions designed for military service members and veterans</p>
         </div>
         
         {/* Tabs */}
-        <div className="flex flex-wrap justify-center mb-8 border-b border-gray-200">
+        <div className="flex flex-wrap justify-center mb-10 border-b border-gray-200">
           <button 
-            className={`px-6 py-3 text-lg font-medium transition-colors duration-200 ${
+            className={`relative px-6 py-3 text-sm font-medium transition-colors duration-200 ${
               activeTab === 'purchase' 
-                ? 'text-primary border-b-2 border-primary' 
+                ? 'text-primary' 
                 : 'text-gray-600 hover:text-primary'
             }`}
             onClick={() => setActiveTab('purchase')}
           >
             Purchase Loans
+            {activeTab === 'purchase' && (
+              <span className="absolute bottom-0 left-0 w-full h-0.5 bg-primary"></span>
+            )}
           </button>
           <button 
-            className={`px-6 py-3 text-lg font-medium transition-colors duration-200 ${
+            className={`relative px-6 py-3 text-sm font-medium transition-colors duration-200 ${
               activeTab === 'refinance' 
-                ? 'text-primary border-b-2 border-primary' 
+                ? 'text-primary' 
                 : 'text-gray-600 hover:text-primary'
             }`}
             onClick={() => setActiveTab('refinance')}
           >
             Refinance Loans
+            {activeTab === 'refinance' && (
+              <span className="absolute bottom-0 left-0 w-full h-0.5 bg-primary"></span>
+            )}
           </button>
           <button 
-            className={`px-6 py-3 text-lg font-medium transition-colors duration-200 ${
+            className={`relative px-6 py-3 text-sm font-medium transition-colors duration-200 ${
               activeTab === 'special' 
-                ? 'text-primary border-b-2 border-primary' 
+                ? 'text-primary' 
                 : 'text-gray-600 hover:text-primary'
             }`}
             onClick={() => setActiveTab('special')}
           >
             Specialized Programs
+            {activeTab === 'special' && (
+              <span className="absolute bottom-0 left-0 w-full h-0.5 bg-primary"></span>
+            )}
           </button>
         </div>
         
         {/* Loan Options */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {loanOptions[activeTab].map((option) => (
-            <div key={option.id} className="card overflow-hidden">
-              <div className="bg-primary/5 p-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {loanOptions[activeTab].map((option, idx) => (
+            <div 
+              key={option.id} 
+              className="bg-white rounded-lg border border-gray-100 shadow-sm overflow-hidden transition-all duration-300 hover:shadow-md group"
+            >
+              <div className={`relative bg-gradient-to-r ${idx % 2 === 0 ? 'from-primary/5 to-primary/10' : 'from-secondary/5 to-secondary/10'} p-6`}>
+                {/* Accent line */}
+                <div className={`absolute top-0 left-0 w-full h-1 bg-gradient-to-r ${idx % 2 === 0 ? 'from-primary to-primary-light' : 'from-secondary to-secondary-light'}`}></div>
+                
                 <div className="flex items-center mb-4">
-                  <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mr-4 text-primary">
-                    <i className={`fas ${option.icon} text-xl`}></i>
+                  <div className={`w-10 h-10 rounded-lg ${idx % 2 === 0 ? 'bg-primary/10 text-primary' : 'bg-secondary/10 text-secondary'} flex items-center justify-center mr-4 transition-all duration-300 group-hover:bg-white`}>
+                    <i className={`fas ${option.icon} text-lg`}></i>
                   </div>
-                  <h3 className="text-xl font-semibold">{option.title}</h3>
+                  <h3 className="text-lg font-semibold text-gray-900">{option.title}</h3>
                 </div>
-                <p className="text-gray-700">{option.description}</p>
+                <p className="text-sm text-gray-600 leading-relaxed">{option.description}</p>
               </div>
               
               <div className="p-6">
                 <div className="mb-6">
-                  <h4 className="text-lg font-medium mb-3 flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <h4 className="text-sm font-medium uppercase tracking-wider text-gray-500 mb-3 flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                     Key Features
@@ -205,18 +227,18 @@ const LoanOptions = () => {
                   <ul className="space-y-2">
                     {option.features.map((feature, index) => (
                       <li key={index} className="flex items-start">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-primary flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <svg xmlns="http://www.w3.org/2000/svg" className={`h-4 w-4 mr-2 ${idx % 2 === 0 ? 'text-primary' : 'text-secondary'} flex-shrink-0 mt-0.5`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                         </svg>
-                        <span className="text-gray-600">{feature}</span>
+                        <span className="text-sm text-gray-600">{feature}</span>
                       </li>
                     ))}
                   </ul>
                 </div>
                 
-                <div>
-                  <h4 className="text-lg font-medium mb-3 flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <div className="pt-4 border-t border-gray-100">
+                  <h4 className="text-sm font-medium uppercase tracking-wider text-gray-500 mb-3 flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                     </svg>
                     Ideal For
@@ -224,17 +246,19 @@ const LoanOptions = () => {
                   <ul className="space-y-2">
                     {option.idealFor.map((ideal, index) => (
                       <li key={index} className="flex items-start">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-primary flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <svg xmlns="http://www.w3.org/2000/svg" className={`h-4 w-4 mr-2 ${idx % 2 === 0 ? 'text-primary' : 'text-secondary'} flex-shrink-0 mt-0.5`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                         </svg>
-                        <span className="text-gray-600">{ideal}</span>
+                        <span className="text-sm text-gray-600">{ideal}</span>
                       </li>
                     ))}
                   </ul>
                 </div>
                 
                 <div className="mt-6">
-                  <button className="btn btn-primary w-full">Learn More</button>
+                  <button className={`w-full px-4 py-2 text-sm font-medium rounded-md transition-colors duration-300 ${idx % 2 === 0 ? 'bg-primary hover:bg-primary-dark text-white' : 'bg-secondary hover:bg-secondary-dark text-white'}`}>
+                    Learn More
+                  </button>
                 </div>
               </div>
             </div>
