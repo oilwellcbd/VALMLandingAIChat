@@ -7,6 +7,12 @@ const LoanProcess = () => {
   const [activeStep, setActiveStep] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
   const processRef = useRef<HTMLDivElement>(null);
+  const stepRefs = useRef<Array<HTMLDivElement | null>>([]);
+
+  // Initialize stepRefs with empty array
+  useEffect(() => {
+    stepRefs.current = stepRefs.current.slice(0, 0).concat(new Array(7).fill(null));
+  }, []);
 
   // Steps data
   const steps = [
@@ -117,6 +123,16 @@ const LoanProcess = () => {
     }
   ];
 
+  // Scroll to active step
+  useEffect(() => {
+    if (stepRefs.current[activeStep]) {
+      stepRefs.current[activeStep]?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center'
+      });
+    }
+  }, [activeStep]);
+
   // Intersection observer to animate when in view
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -150,6 +166,11 @@ const LoanProcess = () => {
     return () => clearInterval(interval);
   }, [isVisible, steps.length]);
 
+  // Function to set ref for each step
+  const setStepRef = (el: HTMLDivElement | null, index: number) => {
+    stepRefs.current[index] = el;
+  };
+
   return (
     <section id="loan-process" className="py-20 bg-white relative overflow-hidden">
       {/* Background elements */}
@@ -171,9 +192,9 @@ const LoanProcess = () => {
           className={`transition-opacity duration-1000 ${isVisible ? 'opacity-100' : 'opacity-0'}`}
         >
           {/* Process visualization */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
             {/* Left side - Steps visualization */}
-            <div className="relative">
+            <div className="relative max-h-[600px] overflow-y-auto pr-4 scrollbar-thin scrollbar-thumb-primary scrollbar-track-gray-100 rounded-lg">
               {/* Progress line */}
               <div className="absolute left-6 top-8 bottom-8 w-1 bg-gray-200 rounded-full"></div>
               <div 
@@ -182,16 +203,17 @@ const LoanProcess = () => {
               ></div>
               
               {/* Steps */}
-              <div className="space-y-12">
+              <div className="space-y-8">
                 {steps.map((step, index) => (
                   <div 
                     key={step.id}
+                    ref={(el) => setStepRef(el, index)}
                     className={`flex items-start transition-all duration-500 ${
                       index === activeStep 
-                        ? 'opacity-100 transform translate-x-0' 
+                        ? 'opacity-100 transform translate-x-0 scale-105' 
                         : index < activeStep 
-                          ? 'opacity-50 transform translate-x-0' 
-                          : 'opacity-50 transform translate-x-0'
+                          ? 'opacity-60 transform translate-x-0' 
+                          : 'opacity-60 transform translate-x-0'
                     }`}
                     onClick={() => setActiveStep(index)}
                   >
@@ -205,6 +227,15 @@ const LoanProcess = () => {
                       }`}
                     >
                       <span className="text-lg font-semibold">{step.id}</span>
+                      
+                      {/* Next step indicator arrow */}
+                      {index === activeStep && index < steps.length - 1 && (
+                        <div className="absolute -bottom-10 left-1/2 transform -translate-x-1/2 text-primary animate-bounce">
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                          </svg>
+                        </div>
+                      )}
                     </div>
                     
                     <div className="ml-6 cursor-pointer">
@@ -216,9 +247,9 @@ const LoanProcess = () => {
                       <p className="text-sm text-gray-600 mb-2">{step.description}</p>
                       
                       {index === activeStep && (
-                        <div className="grid grid-cols-2 gap-3 mt-4 animate-fadeIn">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-3 animate-fadeIn">
                           {step.stats.map((stat, i) => (
-                            <div key={i} className="bg-gray-50 p-3 rounded-lg">
+                            <div key={i} className="bg-gray-50 p-2 rounded-lg border-l-2 border-primary">
                               <p className="text-xs text-gray-500">{stat.label}</p>
                               <p className="text-sm font-medium text-gray-900">{stat.value}</p>
                             </div>
@@ -232,7 +263,7 @@ const LoanProcess = () => {
             </div>
             
             {/* Right side - Active step details */}
-            <div className="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100 transform transition-all duration-700">
+            <div className="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100 transform transition-all duration-700 sticky top-24">
               <div className="bg-gradient-to-r from-primary to-primary-dark p-6 text-white">
                 <div className="flex items-center">
                   <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center mr-4">
@@ -264,6 +295,7 @@ const LoanProcess = () => {
                   <button 
                     onClick={() => setActiveStep(prev => prev === 0 ? steps.length - 1 : prev - 1)}
                     className="p-2 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors"
+                    aria-label="Previous step"
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -286,6 +318,7 @@ const LoanProcess = () => {
                   <button 
                     onClick={() => setActiveStep(prev => prev === steps.length - 1 ? 0 : prev + 1)}
                     className="p-2 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors"
+                    aria-label="Next step"
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
