@@ -8,6 +8,7 @@ const LoanProcess = () => {
   const [isVisible, setIsVisible] = useState(false);
   const processRef = useRef<HTMLDivElement>(null);
   const stepRefs = useRef<Array<HTMLDivElement | null>>([]);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   // Initialize stepRefs with empty array
   useEffect(() => {
@@ -123,13 +124,43 @@ const LoanProcess = () => {
     }
   ];
 
-  // Scroll to active step
+  // Scroll to active step with improved animation
   useEffect(() => {
-    if (stepRefs.current[activeStep]) {
-      stepRefs.current[activeStep]?.scrollIntoView({
-        behavior: 'smooth',
-        block: 'center'
-      });
+    if (stepRefs.current[activeStep] && scrollContainerRef.current) {
+      const container = scrollContainerRef.current;
+      const element = stepRefs.current[activeStep];
+      
+      if (element) {
+        // Calculate the scroll position to center the element
+        const elementRect = element.getBoundingClientRect();
+        const containerRect = container.getBoundingClientRect();
+        
+        const scrollTop = element.offsetTop - container.offsetTop - 
+                         (containerRect.height / 2) + (elementRect.height / 2);
+        
+        // Smooth scroll with custom easing
+        const startPosition = container.scrollTop;
+        const distance = scrollTop - startPosition;
+        const duration = 600;
+        let startTime: number | null = null;
+        
+        const easeOutQuart = (t: number): number => 1 - Math.pow(1 - t, 4);
+        
+        const scroll = (timestamp: number) => {
+          if (!startTime) startTime = timestamp;
+          const elapsed = timestamp - startTime;
+          const progress = Math.min(elapsed / duration, 1);
+          const easing = easeOutQuart(progress);
+          
+          container.scrollTop = startPosition + distance * easing;
+          
+          if (progress < 1) {
+            window.requestAnimationFrame(scroll);
+          }
+        };
+        
+        window.requestAnimationFrame(scroll);
+      }
     }
   }, [activeStep]);
 
@@ -194,51 +225,45 @@ const LoanProcess = () => {
           {/* Process visualization */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
             {/* Left side - Steps visualization */}
-            <div className="relative max-h-[600px] overflow-y-auto pr-4 scrollbar-thin scrollbar-thumb-primary scrollbar-track-gray-100 rounded-lg">
-              {/* Progress line */}
-              <div className="absolute left-6 top-8 bottom-8 w-1 bg-gray-200 rounded-full"></div>
-              <div 
-                className="absolute left-6 top-8 w-1 bg-primary rounded-full transition-all duration-1000" 
-                style={{ height: `${(activeStep / (steps.length - 1)) * 100}%` }}
-              ></div>
-              
+            <div 
+              ref={scrollContainerRef}
+              className="relative max-h-[600px] overflow-y-auto pr-4 hide-scrollbar rounded-lg"
+              style={{
+                scrollbarWidth: 'thin',
+                scrollbarColor: 'rgba(203, 213, 225, 0.5) rgba(243, 244, 246, 0.5)'
+              }}
+            >
               {/* Steps */}
-              <div className="space-y-8">
+              <div className="relative">
+                {/* Timeline line */}
+                <div className="absolute left-[20px] top-0 bottom-0 w-1 bg-gray-200"></div>
+                <div 
+                  className="absolute left-[20px] top-0 w-1 bg-primary transition-all duration-700 ease-out" 
+                  style={{ height: `${(activeStep / (steps.length - 1)) * 100}%` }}
+                ></div>
+                
                 {steps.map((step, index) => (
                   <div 
                     key={step.id}
                     ref={(el) => setStepRef(el, index)}
-                    className={`flex items-start transition-all duration-500 ${
-                      index === activeStep 
-                        ? 'opacity-100 transform translate-x-0 scale-105' 
-                        : index < activeStep 
-                          ? 'opacity-60 transform translate-x-0' 
-                          : 'opacity-60 transform translate-x-0'
-                    }`}
+                    className={`flex py-6 ${index !== steps.length - 1 ? 'border-b border-gray-100' : ''}`}
                     onClick={() => setActiveStep(index)}
                   >
-                    <div 
-                      className={`relative flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center z-10 transition-all duration-300 ${
-                        index === activeStep 
-                          ? 'bg-primary text-white shadow-lg' 
-                          : index < activeStep 
-                            ? 'bg-primary/20 text-primary' 
-                            : 'bg-gray-100 text-gray-400'
-                      }`}
-                    >
-                      <span className="text-lg font-semibold">{step.id}</span>
-                      
-                      {/* Next step indicator arrow */}
-                      {index === activeStep && index < steps.length - 1 && (
-                        <div className="absolute -bottom-10 left-1/2 transform -translate-x-1/2 text-primary animate-bounce">
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-                          </svg>
-                        </div>
-                      )}
+                    <div className="relative">
+                      <div 
+                        className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 ${
+                          index === activeStep 
+                            ? 'bg-primary text-white shadow-lg' 
+                            : index < activeStep 
+                              ? 'bg-primary/20 text-primary' 
+                              : 'bg-gray-100 text-gray-400'
+                        }`}
+                      >
+                        <span className="text-base font-semibold">{step.id}</span>
+                      </div>
                     </div>
                     
-                    <div className="ml-6 cursor-pointer">
+                    <div className="ml-5 flex-1">
                       <h3 className={`text-lg font-semibold mb-1 transition-colors duration-300 ${
                         index === activeStep ? 'text-primary' : 'text-gray-700'
                       }`}>
