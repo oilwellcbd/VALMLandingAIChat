@@ -259,35 +259,138 @@ const LoanProcess = () => {
               <div className="md:w-1/2 relative">
                 <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-secondary/5 rounded-lg"></div>
                 <div className="relative p-4">
-                  <div className="aspect-w-16 aspect-h-9 rounded-lg overflow-hidden shadow-lg border border-primary/10">
-                    <Image 
-                      src="/images/va-loan-success.jpg" 
-                      alt="VA Loan Success Story" 
-                      width={500} 
-                      height={300}
-                      className="object-cover"
-                    />
-                    
-                    {/* Play button overlay */}
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <div className="w-16 h-16 rounded-full bg-white/80 backdrop-blur-sm flex items-center justify-center shadow-lg border border-white/50 cursor-pointer hover:scale-110 transition-transform duration-200">
-                        <div className="w-12 h-12 rounded-full bg-gradient-to-r from-primary to-primary-dark flex items-center justify-center">
-                          <i className="fas fa-play text-white"></i>
+                  <div className="aspect-w-16 aspect-h-9 rounded-lg overflow-hidden shadow-lg border border-primary/10 relative bg-gray-900">
+                    {/* Neural Network House Animation */}
+                    <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-gray-900 via-gray-800 to-gray-900 overflow-hidden">
+                      {/* Neural network nodes */}
+                      {[...Array(20)].map((_, i) => (
+                        <div 
+                          key={i}
+                          className={`absolute w-1.5 h-1.5 rounded-full bg-primary/80 animate-pulse`}
+                          style={{
+                            left: `${Math.random() * 100}%`,
+                            top: `${Math.random() * 100}%`,
+                            animationDelay: `${Math.random() * 3}s`,
+                            animationDuration: `${2 + Math.random() * 3}s`
+                          }}
+                        />
+                      ))}
+                      
+                      {/* House outline created with neural connections */}
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <div className="relative w-64 h-48">
+                          {/* Roof */}
+                          <div className="absolute top-0 left-0 right-0 h-16 overflow-hidden">
+                            <div className="w-0 h-0 border-l-[128px] border-r-[128px] border-b-[64px] border-l-transparent border-r-transparent border-b-primary/20 mx-auto"></div>
+                            <div className="absolute top-0 left-0 right-0">
+                              {[...Array(8)].map((_, i) => (
+                                <div 
+                                  key={i} 
+                                  className="absolute h-px bg-primary animate-glow-pulse"
+                                  style={{
+                                    width: `${100 - i * 12.5}%`,
+                                    left: `${i * 6.25}%`,
+                                    top: `${i * 8}px`,
+                                    animationDelay: `${i * 0.2}s`
+                                  }}
+                                />
+                              ))}
+                            </div>
+                          </div>
+                          
+                          {/* House body */}
+                          <div className="absolute top-16 left-16 right-16 bottom-0 border-2 border-primary/20 rounded-sm overflow-hidden">
+                            {/* Windows and door */}
+                            <div className="absolute top-6 left-6 w-12 h-12 border border-primary/40 rounded-sm"></div>
+                            <div className="absolute top-6 right-6 w-12 h-12 border border-primary/40 rounded-sm"></div>
+                            <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-14 h-20 border-t border-l border-r border-primary/40 rounded-t-sm"></div>
+                            
+                            {/* Neural connections inside house */}
+                            {[...Array(15)].map((_, i) => (
+                              <div 
+                                key={i}
+                                className="absolute bg-primary/30 animate-pulse-slow"
+                                style={{
+                                  height: '1px',
+                                  width: `${20 + Math.random() * 60}px`,
+                                  left: `${Math.random() * 100}%`,
+                                  top: `${Math.random() * 100}%`,
+                                  transform: `rotate(${Math.random() * 360}deg)`,
+                                  animationDelay: `${Math.random() * 3}s`,
+                                  animationDuration: `${3 + Math.random() * 4}s`
+                                }}
+                              />
+                            ))}
+                          </div>
+                          
+                          {/* Animated data points */}
+                          {[...Array(30)].map((_, i) => {
+                            const startX = Math.random() * 100;
+                            const startY = Math.random() * 100;
+                            const endX = Math.random() * 100;
+                            const endY = Math.random() * 100;
+                            
+                            return (
+                              <div 
+                                key={i}
+                                className="absolute w-1 h-1 rounded-full bg-secondary animate-data-flow"
+                                style={{
+                                  left: `${startX}%`,
+                                  top: `${startY}%`,
+                                  '--start-x': `${startX}%`,
+                                  '--start-y': `${startY}%`,
+                                  '--end-x': `${endX}%`,
+                                  '--end-y': `${endY}%`,
+                                  animationDelay: `${Math.random() * 10}s`,
+                                  animationDuration: `${5 + Math.random() * 10}s`
+                                } as React.CSSProperties}
+                              />
+                            );
+                          })}
                         </div>
+                      </div>
+                      
+                      {/* Glowing orb in center */}
+                      <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2">
+                        <div className="w-16 h-16 rounded-full bg-gradient-to-r from-primary/20 to-secondary/20 blur-lg animate-pulse-slow"></div>
+                        <div className="absolute inset-0 w-8 h-8 rounded-full bg-gradient-to-r from-primary/40 to-secondary/40 blur-md animate-pulse-slow" style={{ animationDelay: '1s' }}></div>
+                        <div className="absolute inset-0 w-4 h-4 rounded-full bg-gradient-to-r from-primary to-secondary blur-sm animate-pulse-slow" style={{ animationDelay: '2s' }}></div>
+                      </div>
+                    </div>
+                    
+                    {/* Overlay text */}
+                    <div className="absolute inset-0 flex flex-col items-center justify-center text-white z-10">
+                      <div className="text-lg font-bold mb-2 text-center px-4 text-transparent bg-clip-text bg-gradient-to-r from-primary-light to-secondary animate-pulse-slow">
+                        AI-Powered VA Loan Matching
+                      </div>
+                      <div className="text-xs text-center max-w-xs px-4 text-gray-300">
+                        Our neural network analyzes thousands of loan options to find your perfect match
+                      </div>
+                    </div>
+                    
+                    {/* Interactive play button overlay */}
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="w-16 h-16 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center shadow-lg border border-white/20 cursor-pointer hover:scale-110 transition-transform duration-200 group">
+                        <div 
+                          className={`w-12 h-12 rounded-full bg-gradient-to-r from-primary to-primary-dark flex items-center justify-center group-hover:from-primary-dark group-hover:to-primary`}
+                        >
+                          <i className="fas fa-play text-white group-hover:scale-110 transition-transform duration-200"></i>
+                        </div>
+                        <div className="absolute -inset-1 bg-primary/20 rounded-full blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                       </div>
                     </div>
                   </div>
                   
-                  {/* Success stats */}
-                  <div className="absolute -bottom-4 -right-4 bg-white rounded-lg p-3 shadow-lg border border-primary/10">
+                  {/* Success stats - enhanced version */}
+                  <div className="absolute -bottom-4 -right-4 bg-white rounded-lg p-3 shadow-lg border border-primary/10 hover:shadow-xl transition-shadow duration-300">
                     <div className="flex items-center space-x-3">
-                      <div className="text-center">
-                        <div className="text-xl font-bold text-primary">98%</div>
+                      <div className="text-center group">
+                        <div className="text-xl font-bold text-primary group-hover:scale-110 transition-transform duration-300">98%</div>
                         <div className="text-xs text-gray-500">Success Rate</div>
                       </div>
-                      <div className="h-8 w-px bg-gray-200"></div>
-                      <div className="text-center">
-                        <div className="text-xl font-bold text-secondary">14k+</div>
+                      <div className="h-8 w-px bg-gradient-to-b from-gray-100 via-primary/20 to-gray-100"></div>
+                      <div className="text-center group">
+                        <div className="text-xl font-bold text-secondary group-hover:scale-110 transition-transform duration-300">14k+</div>
                         <div className="text-xs text-gray-500">Veterans Helped</div>
                       </div>
                     </div>
