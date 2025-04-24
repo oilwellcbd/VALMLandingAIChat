@@ -192,7 +192,7 @@ const LoanProcess = () => {
 
     const interval = setInterval(() => {
       setActiveStep((prev) => (prev === steps.length - 1 ? 0 : prev + 1));
-    }, 5000);
+    }, 8000);
 
     return () => clearInterval(interval);
   }, [isVisible, steps.length]);
@@ -201,6 +201,9 @@ const LoanProcess = () => {
   const setStepRef = (el: HTMLDivElement | null, index: number) => {
     stepRefs.current[index] = el;
   };
+
+  // Calculate progress percentage
+  const progressPercentage = (activeStep / (steps.length - 1)) * 100;
 
   return (
     <section id="loan-process" className="py-20 bg-white relative overflow-hidden">
@@ -237,10 +240,6 @@ const LoanProcess = () => {
               <div className="relative">
                 {/* Timeline line */}
                 <div className="absolute left-[20px] top-0 bottom-0 w-1 bg-gray-200"></div>
-                <div 
-                  className="absolute left-[20px] top-0 w-1 bg-primary transition-all duration-700 ease-out" 
-                  style={{ height: `${(activeStep / (steps.length - 1)) * 100}%` }}
-                ></div>
                 
                 {steps.map((step, index) => (
                   <div 
@@ -249,9 +248,25 @@ const LoanProcess = () => {
                     className={`flex py-6 ${index !== steps.length - 1 ? 'border-b border-gray-100' : ''}`}
                     onClick={() => setActiveStep(index)}
                   >
+                    {/* Circle indicator */}
                     <div className="relative">
+                      {/* Blue progress line - rendered BEHIND the circle */}
+                      {index > 0 && index <= activeStep && (
+                        <div 
+                          className="absolute left-[20px] top-[-24px] w-1 bg-primary transition-all duration-1500 ease-out"
+                          style={{ height: '24px' }}
+                        ></div>
+                      )}
+                      
+                      {index < activeStep && (
+                        <div 
+                          className="absolute left-[20px] bottom-[-24px] w-1 bg-primary transition-all duration-1500 ease-out"
+                          style={{ height: '24px' }}
+                        ></div>
+                      )}
+                      
                       <div 
-                        className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 ${
+                        className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-500 ${
                           index === activeStep 
                             ? 'bg-primary text-white shadow-lg' 
                             : index < activeStep 
