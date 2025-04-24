@@ -1,15 +1,16 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import Image from 'next/image';
 
 interface BenefitCardProps {
-  icon: string;
+  iconSrc: string;
   title: string;
   description: string;
   delay?: number;
 }
 
-const BenefitCard = ({ icon, title, description, delay = 0 }: BenefitCardProps) => {
+const BenefitCard = ({ iconSrc, title, description, delay = 0 }: BenefitCardProps) => {
   const [isVisible, setIsVisible] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
 
@@ -46,7 +47,14 @@ const BenefitCard = ({ icon, title, description, delay = 0 }: BenefitCardProps) 
       }`}
     >
       <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-4 text-primary">
-        <i className={`fas ${icon} text-2xl`}></i>
+        <div className="relative w-10 h-10">
+          <Image 
+            src={iconSrc}
+            alt={title}
+            fill
+            className="object-contain"
+          />
+        </div>
       </div>
       <h3 className="text-xl font-semibold mb-2">{title}</h3>
       <p className="text-gray-600">{description}</p>
@@ -57,32 +65,32 @@ const BenefitCard = ({ icon, title, description, delay = 0 }: BenefitCardProps) 
 const Benefits = () => {
   const benefits = [
     {
-      icon: 'fa-dollar-sign',
+      iconSrc: '/images/icons/no-down-payment.svg',
       title: 'No Down Payment',
       description: 'Purchase a home with 0% down in most cases, making homeownership more accessible.'
     },
     {
-      icon: 'fa-percentage',
+      iconSrc: '/images/icons/competitive-rates.svg',
       title: 'Competitive Rates',
       description: 'Enjoy lower interest rates compared to conventional loans, saving you money over time.'
     },
     {
-      icon: 'fa-shield-alt',
+      iconSrc: '/images/icons/no-pmi.svg',
       title: 'No PMI Required',
       description: 'VA loans don\'t require private mortgage insurance, reducing your monthly payment.'
     },
     {
-      icon: 'fa-bolt',
+      iconSrc: '/images/icons/faster-closings.svg',
       title: 'Faster Closings',
       description: 'Our streamlined process helps you close quickly and move into your new home sooner.'
     },
     {
-      icon: 'fa-chart-line',
+      iconSrc: '/images/icons/flexible-credit.svg',
       title: 'Flexible Credit',
       description: 'More forgiving credit requirements than conventional loans, helping more veterans qualify.'
     },
     {
-      icon: 'fa-file-invoice-dollar',
+      iconSrc: '/images/icons/limited-closing-costs.svg',
       title: 'Limited Closing Costs',
       description: 'The VA limits certain closing costs and allows sellers to pay all closing costs.'
     }
@@ -100,7 +108,7 @@ const Benefits = () => {
           {benefits.map((benefit, index) => (
             <BenefitCard 
               key={index}
-              icon={benefit.icon}
+              iconSrc={benefit.iconSrc}
               title={benefit.title}
               description={benefit.description}
               delay={index * 100}

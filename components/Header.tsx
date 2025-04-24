@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 
 const Header = () => {
@@ -16,9 +17,14 @@ const Header = () => {
         <div className="flex justify-between items-center">
           <div className="flex items-center">
             <Link href="/" className="flex items-center">
-              <div className="h-10 w-40 bg-gray-200 flex items-center justify-center text-primary font-bold">
-                VA Loans Finance
-              </div>
+              <Image 
+                src="/images/logo.png" 
+                alt="VA Loan Mortgages Logo" 
+                width={262} 
+                height={75}
+                className="h-auto w-60"
+                priority
+              />
             </Link>
           </div>
 

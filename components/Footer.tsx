@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
@@ -11,10 +12,15 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
           {/* Column 1 - About */}
           <div>
-            <div className="mb-4">
+            <div className="mb-4 flex justify-start">
               <Link href="/" className="inline-block">
-                <div className="h-10 w-40 bg-gray-700 flex items-center justify-center text-white font-bold">
-                  VA Loans Finance
+                <div className="relative w-80 h-20">
+                  <Image 
+                    src="/images/logo.png" 
+                    alt="VA Loan Mortgages Logo" 
+                    fill
+                    className="object-contain object-left"
+                  />
                 </div>
               </Link>
             </div>
@@ -138,24 +144,46 @@ const Footer = () => {
         </div>
         
         {/* Military Branch Logos */}
-        <div className="flex flex-wrap justify-center gap-8 py-8 border-t border-b border-gray-800">
-          <div className="h-10 w-10 bg-gray-700 flex items-center justify-center text-white font-bold">
-            Army
+        <div className="flex flex-wrap justify-center gap-12 py-10 border-t border-b border-gray-800">
+          <div className="relative h-32 w-32">
+            <Image 
+              src="/images/military/logo-1.png" 
+              alt="Army Logo" 
+              fill
+              className="object-contain"
+            />
           </div>
-          <div className="h-10 w-10 bg-gray-700 flex items-center justify-center text-white font-bold">
-            Navy
+          <div className="relative h-32 w-32">
+            <Image 
+              src="/images/military/logo-2.png" 
+              alt="Navy Logo" 
+              fill
+              className="object-contain"
+            />
           </div>
-          <div className="h-10 w-10 bg-gray-700 flex items-center justify-center text-white font-bold">
-            Air Force
+          <div className="relative h-32 w-32">
+            <Image 
+              src="/images/military/logo-3.png" 
+              alt="Air Force Logo" 
+              fill
+              className="object-contain"
+            />
           </div>
-          <div className="h-10 w-10 bg-gray-700 flex items-center justify-center text-white font-bold">
-            Marines
+          <div className="relative h-32 w-32">
+            <Image 
+              src="/images/military/logo-4.png" 
+              alt="Marines Logo" 
+              fill
+              className="object-contain"
+            />
           </div>
-          <div className="h-10 w-10 bg-gray-700 flex items-center justify-center text-white font-bold">
-            Coast Guard
-          </div>
-          <div className="h-10 w-10 bg-gray-700 flex items-center justify-center text-white font-bold">
-            National Guard
+          <div className="relative h-32 w-32">
+            <Image 
+              src="/images/military/logo-5.png" 
+              alt="Coast Guard Logo" 
+              fill
+              className="object-contain"
+            />
           </div>
         </div>
         

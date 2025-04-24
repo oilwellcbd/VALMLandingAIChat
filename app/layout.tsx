@@ -2,8 +2,12 @@ import type { Metadata } from 'next';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'VA Loans Finance - Expert VA Loan Services',
-  description: 'Get the VA loan you deserve with expert guidance and AI-powered assistance. Learn about benefits, eligibility, and start your application today.',
+  title: 'VA Loans Finance | Expert VA Loan Services',
+  description: 'VA Loans Finance offers specialized VA loan services for military members, veterans, and their families. Get expert guidance on VA home loans, refinancing, and more.',
+  icons: {
+    icon: '/images/logo.png',
+    apple: '/images/logo.png',
+  },
 };
 
 export default function RootLayout({
@@ -18,8 +22,10 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Montserrat:wght@500;600;700&display=swap" rel="stylesheet" />
       </head>
-      <body>
-        {children}
+      <body className="min-h-screen flex flex-col">
+        <div className="flex-grow">
+          {children}
+        </div>
       </body>
     </html>
   );

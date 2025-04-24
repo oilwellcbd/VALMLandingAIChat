@@ -44,12 +44,47 @@ const Hero = () => {
             </div>
             
             {/* Military Badges */}
-            <div className="flex justify-center mt-8 space-x-4">
-              <div className="military-badge bg-gray-200 w-12 h-12 rounded-full flex items-center justify-center text-xs">Army</div>
-              <div className="military-badge bg-gray-200 w-12 h-12 rounded-full flex items-center justify-center text-xs">Navy</div>
-              <div className="military-badge bg-gray-200 w-12 h-12 rounded-full flex items-center justify-center text-xs">Air Force</div>
-              <div className="military-badge bg-gray-200 w-12 h-12 rounded-full flex items-center justify-center text-xs">Marines</div>
-              <div className="military-badge bg-gray-200 w-12 h-12 rounded-full flex items-center justify-center text-xs">Coast Guard</div>
+            <div className="flex justify-center mt-8 space-x-6">
+              <div className="relative w-24 h-24 rounded-full overflow-hidden">
+                <Image 
+                  src="/images/military/logo-1.png" 
+                  alt="Army Logo" 
+                  fill
+                  className="object-contain"
+                />
+              </div>
+              <div className="relative w-24 h-24 rounded-full overflow-hidden">
+                <Image 
+                  src="/images/military/logo-2.png" 
+                  alt="Navy Logo" 
+                  fill
+                  className="object-contain"
+                />
+              </div>
+              <div className="relative w-24 h-24 rounded-full overflow-hidden">
+                <Image 
+                  src="/images/military/logo-3.png" 
+                  alt="Air Force Logo" 
+                  fill
+                  className="object-contain"
+                />
+              </div>
+              <div className="relative w-24 h-24 rounded-full overflow-hidden">
+                <Image 
+                  src="/images/military/logo-4.png" 
+                  alt="Marines Logo" 
+                  fill
+                  className="object-contain"
+                />
+              </div>
+              <div className="relative w-24 h-24 rounded-full overflow-hidden">
+                <Image 
+                  src="/images/military/logo-5.png" 
+                  alt="Coast Guard Logo" 
+                  fill
+                  className="object-contain"
+                />
+              </div>
             </div>
           </div>
           
