@@ -9,14 +9,14 @@ module.exports = {
     extend: {
       colors: {
         primary: {
-          DEFAULT: '#0D47A1', // Navy blue
-          light: '#1976D2',
-          dark: '#002171',
+          DEFAULT: '#1A2F5A', // Dark navy blue from logo
+          light: '#2C4780',
+          dark: '#0E1B36',
         },
         secondary: {
-          DEFAULT: '#D4AF37', // Gold
-          light: '#FFD700',
-          dark: '#B8860B',
+          DEFAULT: '#B22234', // Red from logo
+          light: '#D13545',
+          dark: '#8E1B29',
         },
         accent: {
           DEFAULT: '#607D8B', // Blue-gray

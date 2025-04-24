@@ -76,12 +76,14 @@ const Header = () => {
             <Link href="#blog" className="text-gray-700 hover:text-primary font-medium">
               Resources
             </Link>
-            <Link href="#contact" className="btn btn-outline">
-              Contact Us
-            </Link>
-            <Link href="#apply" className="btn btn-primary">
-              Apply Now
-            </Link>
+            <div className="flex items-center space-x-4">
+              <Link href="#contact" className="btn btn-outline hidden md:inline-flex">
+                Contact Us
+              </Link>
+              <Link href="#apply" className="btn btn-secondary">
+                Apply Now
+              </Link>
+            </div>
           </nav>
         </div>
 
@@ -107,7 +109,7 @@ const Header = () => {
               <Link href="#contact" className="btn btn-outline w-full text-center" onClick={toggleMenu}>
                 Contact Us
               </Link>
-              <Link href="#apply" className="btn btn-primary w-full text-center" onClick={toggleMenu}>
+              <Link href="#apply" className="btn btn-secondary w-full text-center" onClick={toggleMenu}>
                 Apply Now
               </Link>
             </div>
