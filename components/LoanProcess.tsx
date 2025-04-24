@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 
 const LoanProcess = () => {
@@ -139,45 +139,85 @@ const LoanProcess = () => {
             {steps.map((step, index) => (
               <div 
                 key={index}
-                className={`flex items-center transition-all duration-700 ${
+                className={`transition-all duration-700 ${
                   isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
                 }`}
                 style={{ transitionDelay: `${index * 150}ms` }}
-                onMouseEnter={() => setActiveStep(index)}
-                onMouseLeave={() => setActiveStep(null)}
               >
-                {/* Left side (odd steps) */}
-                {index % 2 === 0 && (
-                  <div className="w-1/2 pr-8 text-right">
-                    <div className={`transition-all duration-300 ${activeStep === index ? 'transform -translate-y-1' : ''}`}>
-                      <h3 className="text-xl font-semibold text-gray-900 mb-2">{step.title}</h3>
-                      <p className="text-gray-600">{step.description}</p>
-                      
-                      {/* Details that appear on hover */}
-                      <div className={`mt-4 space-y-2 overflow-hidden transition-all duration-300 ${
-                        activeStep === index ? 'max-h-40 opacity-100' : 'max-h-0 opacity-0'
-                      }`}>
-                        {step.details.map((detail, i) => (
-                          <div key={i} className="flex items-center justify-end text-sm text-gray-600">
-                            <span>{detail}</span>
-                            <div className="w-1.5 h-1.5 rounded-full bg-primary ml-2"></div>
-                          </div>
-                        ))}
+                <div className="flex items-center">
+                  {/* Left side content (for even-indexed steps) */}
+                  {index % 2 === 0 && (
+                    <div className="w-1/2 pr-8 text-right">
+                      <div 
+                        className={`transition-all duration-300 ${activeStep === index ? 'transform -translate-y-1' : ''}`}
+                        onMouseEnter={() => setActiveStep(index)}
+                        onMouseLeave={() => setActiveStep(null)}
+                      >
+                        <h3 className="text-xl font-semibold text-gray-900 mb-2">{step.title}</h3>
+                        <p className="text-gray-600">{step.description}</p>
+                        
+                        {/* Details that appear on hover */}
+                        <div className={`mt-4 space-y-2 overflow-hidden transition-all duration-300 ${
+                          activeStep === index ? 'max-h-40 opacity-100' : 'max-h-0 opacity-0'
+                        }`}>
+                          {step.details.map((detail, i) => (
+                            <div key={i} className="flex items-center justify-end text-sm text-gray-600">
+                              <span>{detail}</span>
+                              <div className="w-1.5 h-1.5 rounded-full bg-primary ml-2"></div>
+                            </div>
+                          ))}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                )}
+                  )}
+                  
+                  {/* Empty space for right side (for even-indexed steps) */}
+                  {index % 2 === 0 && <div className="w-1/2"></div>}
+                  
+                  {/* Empty space for left side (for odd-indexed steps) */}
+                  {index % 2 === 1 && <div className="w-1/2"></div>}
+                  
+                  {/* Right side content (for odd-indexed steps) */}
+                  {index % 2 === 1 && (
+                    <div className="w-1/2 pl-8">
+                      <div 
+                        className={`transition-all duration-300 ${activeStep === index ? 'transform -translate-y-1' : ''}`}
+                        onMouseEnter={() => setActiveStep(index)}
+                        onMouseLeave={() => setActiveStep(null)}
+                      >
+                        <h3 className="text-xl font-semibold text-gray-900 mb-2">{step.title}</h3>
+                        <p className="text-gray-600">{step.description}</p>
+                        
+                        {/* Details that appear on hover */}
+                        <div className={`mt-4 space-y-2 overflow-hidden transition-all duration-300 ${
+                          activeStep === index ? 'max-h-40 opacity-100' : 'max-h-0 opacity-0'
+                        }`}>
+                          {step.details.map((detail, i) => (
+                            <div key={i} className="flex items-center text-sm text-gray-600">
+                              <div className="w-1.5 h-1.5 rounded-full bg-primary mr-2"></div>
+                              <span>{detail}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
                 
-                {/* Center icon */}
-                <div className="absolute left-1/2 transform -translate-x-1/2 flex flex-col items-center">
-                  <div className={`w-12 h-12 rounded-full bg-gradient-to-br from-primary to-primary-dark text-white flex items-center justify-center z-10 shadow-lg transition-all duration-300 ${
-                    activeStep === index ? 'scale-110 shadow-primary/30' : ''
-                  }`}>
+                {/* Center icon - positioned absolutely */}
+                <div className="absolute left-1/2 transform -translate-x-1/2" style={{ top: index % 2 === 0 ? '0' : '0' }}>
+                  <div 
+                    className={`w-12 h-12 rounded-full bg-gradient-to-br from-primary to-primary-dark text-white flex items-center justify-center z-10 shadow-lg transition-all duration-300 ${
+                      activeStep === index ? 'scale-110 shadow-primary/30' : ''
+                    }`}
+                    onMouseEnter={() => setActiveStep(index)}
+                    onMouseLeave={() => setActiveStep(null)}
+                  >
                     <i className={`fas ${step.icon} text-lg`}></i>
                   </div>
                   
                   {/* Step number */}
-                  <div className="absolute -bottom-6 bg-white text-primary text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center border border-primary/20">
+                  <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 bg-white text-primary text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center border border-primary/20">
                     {index + 1}
                   </div>
                   
@@ -185,34 +225,6 @@ const LoanProcess = () => {
                   <div className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-secondary"></div>
                   <div className="absolute -bottom-1 -left-1 w-2 h-2 rounded-full bg-primary-light"></div>
                 </div>
-                
-                {/* Right side (even steps) */}
-                {index % 2 === 1 && (
-                  <div className="w-1/2 pl-8">
-                    <div className={`transition-all duration-300 ${activeStep === index ? 'transform -translate-y-1' : ''}`}>
-                      <h3 className="text-xl font-semibold text-gray-900 mb-2">{step.title}</h3>
-                      <p className="text-gray-600">{step.description}</p>
-                      
-                      {/* Details that appear on hover */}
-                      <div className={`mt-4 space-y-2 overflow-hidden transition-all duration-300 ${
-                        activeStep === index ? 'max-h-40 opacity-100' : 'max-h-0 opacity-0'
-                      }`}>
-                        {step.details.map((detail, i) => (
-                          <div key={i} className="flex items-center text-sm text-gray-600">
-                            <div className="w-1.5 h-1.5 rounded-full bg-primary mr-2"></div>
-                            <span>{detail}</span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                )}
-                
-                {/* Empty div for even steps on left side */}
-                {index % 2 === 1 && <div className="w-1/2"></div>}
-                
-                {/* Empty div for odd steps on right side */}
-                {index % 2 === 0 && <div className="w-1/2"></div>}
               </div>
             ))}
           </div>
