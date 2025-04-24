@@ -37,7 +37,9 @@ const ChatComponent = () => {
 
   // Scroll to bottom of chat when messages change
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth', block: 'end' });
+    }
   }, [messages]);
 
   // Auto-resize textarea
@@ -156,7 +158,8 @@ const ChatComponent = () => {
         className="flex-1 p-6 pt-10 overflow-y-auto scrollbar-thin scrollbar-thumb-primary/30 scrollbar-track-gray-100"
         style={{
           backgroundImage: 'radial-gradient(rgba(99, 102, 241, 0.05) 1px, transparent 1px)',
-          backgroundSize: '20px 20px'
+          backgroundSize: '20px 20px',
+          overflowAnchor: 'none' // Prevents browser from automatically scrolling when content changes
         }}
       >
         {messages.map((message, index) => (
@@ -235,7 +238,7 @@ const ChatComponent = () => {
           </div>
         )}
         
-        <div ref={messagesEndRef} />
+        <div ref={messagesEndRef} style={{ height: '1px', opacity: 0 }} />
       </div>
 
       {/* Input area with enhanced glossy styling */}
