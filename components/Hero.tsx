@@ -239,7 +239,13 @@ const Hero = () => {
               
               {/* Chat component */}
               <div className="relative bg-white rounded-2xl shadow-2xl overflow-hidden border border-primary/20 transition-all duration-500">
-                <ChatComponent />
+                <div className="flex flex-col h-[700px] relative">
+                  <div className="absolute -top-6 right-6 bg-gradient-to-r from-primary to-primary-dark text-white px-3 py-1 rounded-t-lg text-xs font-medium z-20 flex items-center shadow-lg">
+                    <div className="w-2 h-2 bg-green-400 rounded-full mr-2 animate-pulse"></div>
+                    VA Loan Expert
+                  </div>
+                  <ChatComponent />
+                </div>
               </div>
             </div>
           </div>
