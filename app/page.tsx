@@ -1,6 +1,7 @@
 import Header from '@/components/Header';
 import Hero from '@/components/Hero';
 import Benefits from '@/components/Benefits';
+import LoanProcess from '@/components/LoanProcess';
 import Eligibility from '@/components/Eligibility';
 import LoanOptions from '@/components/LoanOptions';
 import BlogSection from '@/components/BlogSection';
@@ -19,6 +20,7 @@ export default function Home() {
       <main>
         <Hero />
         <Benefits />
+        <LoanProcess />
         <Eligibility />
         <LoanOptions />
         <Calculator />

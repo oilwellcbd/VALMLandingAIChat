@@ -83,277 +83,337 @@ const Calculator = () => {
   };
 
   return (
-    <section id="calculator" className="section bg-white">
-      <div className="container">
-        <div className="section-header">
-          <h2 className="text-primary mb-2">VA Loan Calculators</h2>
-          <p className="text-xl text-gray-600">Plan your VA loan with our easy-to-use tools</p>
+    <section id="calculator" className="py-16 bg-gray-50 relative overflow-hidden">
+      {/* Subtle background pattern */}
+      <div className="absolute inset-0 bg-[url('/images/backgrounds/hero-pattern.svg')] bg-repeat opacity-5"></div>
+      
+      <div className="container mx-auto px-4 relative z-10">
+        <div className="max-w-3xl mx-auto text-center mb-12">
+          <div className="inline-block px-3 py-1 bg-primary/10 rounded-full text-primary text-xs font-medium tracking-wider uppercase mb-3">
+            Financial Planning
+          </div>
+          <h2 className="text-3xl font-bold text-gray-900 mb-4">VA Loan Calculators</h2>
+          <div className="w-16 h-1 bg-secondary mx-auto mb-4"></div>
+          <p className="text-gray-600">Plan your VA loan with precision using our sophisticated financial tools</p>
         </div>
         
         {/* Calculator Tabs */}
-        <div className="flex flex-wrap justify-center mb-8 border-b border-gray-200">
+        <div className="flex flex-wrap justify-center mb-10 border-b border-gray-200">
           <button 
-            className={`px-6 py-3 text-lg font-medium transition-colors duration-200 ${
+            className={`relative px-6 py-3 text-sm font-medium transition-colors duration-200 ${
               activeTab === 'payment' 
-                ? 'text-primary border-b-2 border-primary' 
+                ? 'text-primary' 
                 : 'text-gray-600 hover:text-primary'
             }`}
             onClick={() => setActiveTab('payment')}
           >
             Payment Calculator
+            {activeTab === 'payment' && (
+              <span className="absolute bottom-0 left-0 w-full h-0.5 bg-primary"></span>
+            )}
           </button>
           <button 
-            className={`px-6 py-3 text-lg font-medium transition-colors duration-200 ${
+            className={`relative px-6 py-3 text-sm font-medium transition-colors duration-200 ${
               activeTab === 'affordability' 
-                ? 'text-primary border-b-2 border-primary' 
+                ? 'text-primary' 
                 : 'text-gray-600 hover:text-primary'
             }`}
             onClick={() => setActiveTab('affordability')}
           >
             Affordability Calculator
+            {activeTab === 'affordability' && (
+              <span className="absolute bottom-0 left-0 w-full h-0.5 bg-primary"></span>
+            )}
           </button>
         </div>
         
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
           {/* Calculator Form */}
-          <div className="card p-8">
-            {activeTab === 'payment' ? (
-              <>
-                <h3 className="text-2xl font-semibold mb-6">Estimate Your Monthly Payment</h3>
-                
+          <div className="lg:col-span-3 bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
+            <div className="p-6 border-b border-gray-100">
+              <h3 className="text-lg font-semibold text-gray-900">
+                {activeTab === 'payment' ? 'Calculate Your Monthly Payment' : 'Estimate What You Can Afford'}
+              </h3>
+              <p className="text-sm text-gray-600 mt-1">
+                {activeTab === 'payment' 
+                  ? 'See what your monthly payments would be based on loan amount, interest rate, and term.' 
+                  : 'Find out how much house you can afford based on your income and existing debts.'}
+              </p>
+            </div>
+            
+            <div className="p-6">
+              {activeTab === 'payment' ? (
                 <div className="space-y-6">
                   <div>
-                    <label className="block text-gray-700 font-medium mb-2">
-                      Loan Amount: {formatCurrency(loanAmount)}
-                    </label>
+                    <div className="flex justify-between mb-2">
+                      <label htmlFor="loan-amount" className="block text-sm font-medium text-gray-700">
+                        Loan Amount: {formatCurrency(loanAmount)}
+                      </label>
+                      <span className="text-xs text-gray-500">${loanAmount.toLocaleString()}</span>
+                    </div>
                     <input
                       type="range"
+                      id="loan-amount"
                       min="50000"
                       max="1000000"
-                      step="10000"
+                      step="1000"
                       value={loanAmount}
                       onChange={(e) => setLoanAmount(Number(e.target.value))}
-                      className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                      className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-primary"
                     />
-                    <div className="flex justify-between text-xs text-gray-500 mt-1">
-                      <span>$50,000</span>
-                      <span>$1,000,000</span>
+                    <div className="flex justify-between mt-1">
+                      <span className="text-xs text-gray-500">$50,000</span>
+                      <span className="text-xs text-gray-500">$1,000,000</span>
                     </div>
                   </div>
                   
                   <div>
-                    <label className="block text-gray-700 font-medium mb-2">
-                      Interest Rate: {interestRate}%
-                    </label>
+                    <div className="flex justify-between mb-2">
+                      <label htmlFor="interest-rate" className="block text-sm font-medium text-gray-700">
+                        Interest Rate: {interestRate}%
+                      </label>
+                      <span className="text-xs text-gray-500">{interestRate}%</span>
+                    </div>
                     <input
                       type="range"
+                      id="interest-rate"
                       min="2"
                       max="10"
                       step="0.125"
                       value={interestRate}
                       onChange={(e) => setInterestRate(Number(e.target.value))}
-                      className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                      className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-primary"
                     />
-                    <div className="flex justify-between text-xs text-gray-500 mt-1">
-                      <span>2%</span>
-                      <span>10%</span>
+                    <div className="flex justify-between mt-1">
+                      <span className="text-xs text-gray-500">2%</span>
+                      <span className="text-xs text-gray-500">10%</span>
                     </div>
                   </div>
                   
                   <div>
-                    <label className="block text-gray-700 font-medium mb-2">
-                      Loan Term: {loanTerm} years
-                    </label>
+                    <div className="flex justify-between mb-2">
+                      <label htmlFor="loan-term" className="block text-sm font-medium text-gray-700">
+                        Loan Term: {loanTerm} years
+                      </label>
+                      <span className="text-xs text-gray-500">{loanTerm} years</span>
+                    </div>
                     <div className="flex space-x-4">
-                      <button
-                        className={`flex-1 py-2 rounded-lg transition-colors ${
-                          loanTerm === 15 
-                            ? 'bg-primary text-white' 
-                            : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                        }`}
-                        onClick={() => setLoanTerm(15)}
-                      >
-                        15 Years
-                      </button>
-                      <button
-                        className={`flex-1 py-2 rounded-lg transition-colors ${
-                          loanTerm === 30 
-                            ? 'bg-primary text-white' 
-                            : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                        }`}
-                        onClick={() => setLoanTerm(30)}
-                      >
-                        30 Years
-                      </button>
+                      {[15, 20, 30].map((term) => (
+                        <button
+                          key={term}
+                          type="button"
+                          onClick={() => setLoanTerm(term)}
+                          className={`flex-1 py-2 px-3 text-sm font-medium rounded-md transition-all duration-300 ${
+                            loanTerm === term
+                              ? 'bg-primary text-white'
+                              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                          }`}
+                        >
+                          {term} Years
+                        </button>
+                      ))}
                     </div>
                   </div>
                 </div>
-              </>
-            ) : (
-              <>
-                <h3 className="text-2xl font-semibold mb-6">How Much Can You Afford?</h3>
-                
+              ) : (
                 <div className="space-y-6">
                   <div>
-                    <label className="block text-gray-700 font-medium mb-2">
-                      Annual Income: {formatCurrency(annualIncome)}
-                    </label>
+                    <div className="flex justify-between mb-2">
+                      <label htmlFor="annual-income" className="block text-sm font-medium text-gray-700">
+                        Annual Income: {formatCurrency(annualIncome)}
+                      </label>
+                      <span className="text-xs text-gray-500">${annualIncome.toLocaleString()}</span>
+                    </div>
                     <input
                       type="range"
+                      id="annual-income"
                       min="30000"
-                      max="200000"
-                      step="5000"
+                      max="300000"
+                      step="1000"
                       value={annualIncome}
                       onChange={(e) => setAnnualIncome(Number(e.target.value))}
-                      className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                      className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-primary"
                     />
-                    <div className="flex justify-between text-xs text-gray-500 mt-1">
-                      <span>$30,000</span>
-                      <span>$200,000</span>
+                    <div className="flex justify-between mt-1">
+                      <span className="text-xs text-gray-500">$30,000</span>
+                      <span className="text-xs text-gray-500">$300,000</span>
                     </div>
                   </div>
                   
                   <div>
-                    <label className="block text-gray-700 font-medium mb-2">
-                      Monthly Debts: {formatCurrency(monthlyDebts)}
-                    </label>
+                    <div className="flex justify-between mb-2">
+                      <label htmlFor="monthly-debts" className="block text-sm font-medium text-gray-700">
+                        Monthly Debts: {formatCurrency(monthlyDebts)}
+                      </label>
+                      <span className="text-xs text-gray-500">${monthlyDebts.toLocaleString()}</span>
+                    </div>
                     <input
                       type="range"
+                      id="monthly-debts"
                       min="0"
-                      max="3000"
-                      step="100"
+                      max="5000"
+                      step="50"
                       value={monthlyDebts}
                       onChange={(e) => setMonthlyDebts(Number(e.target.value))}
-                      className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                      className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-primary"
                     />
-                    <div className="flex justify-between text-xs text-gray-500 mt-1">
-                      <span>$0</span>
-                      <span>$3,000</span>
+                    <div className="flex justify-between mt-1">
+                      <span className="text-xs text-gray-500">$0</span>
+                      <span className="text-xs text-gray-500">$5,000</span>
                     </div>
                   </div>
                   
                   <div>
-                    <label className="block text-gray-700 font-medium mb-2">
-                      Down Payment: {formatCurrency(downPayment)}
-                    </label>
+                    <div className="flex justify-between mb-2">
+                      <label htmlFor="down-payment" className="block text-sm font-medium text-gray-700">
+                        Down Payment: {formatCurrency(downPayment)}
+                      </label>
+                      <span className="text-xs text-gray-500">${downPayment.toLocaleString()}</span>
+                    </div>
                     <input
                       type="range"
+                      id="down-payment"
                       min="0"
                       max="100000"
-                      step="5000"
+                      step="1000"
                       value={downPayment}
                       onChange={(e) => setDownPayment(Number(e.target.value))}
-                      className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                      className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-primary"
                     />
-                    <div className="flex justify-between text-xs text-gray-500 mt-1">
-                      <span>$0</span>
-                      <span>$100,000</span>
+                    <div className="flex justify-between mt-1">
+                      <span className="text-xs text-gray-500">$0</span>
+                      <span className="text-xs text-gray-500">$100,000</span>
                     </div>
                   </div>
                 </div>
-              </>
-            )}
+              )}
+            </div>
           </div>
           
           {/* Results */}
-          <div className="card p-8 bg-primary/5">
-            {activeTab === 'payment' ? (
-              <>
-                <h3 className="text-2xl font-semibold mb-6">Your Estimated Payment</h3>
-                
-                <div className="mb-8">
-                  <div className="text-center">
-                    <span className="text-5xl font-bold text-primary">{formatCurrency(monthlyPayment)}</span>
-                    <span className="text-gray-600 ml-2">per month</span>
-                  </div>
-                  <p className="text-center text-gray-500 mt-2">Principal and Interest</p>
-                </div>
-                
-                <div className="space-y-4">
-                  <div className="flex justify-between pb-4 border-b border-gray-200">
-                    <span className="text-gray-700">Loan Amount:</span>
-                    <span className="font-medium">{formatCurrency(loanAmount)}</span>
-                  </div>
-                  
-                  <div className="flex justify-between pb-4 border-b border-gray-200">
-                    <span className="text-gray-700">VA Funding Fee:</span>
-                    <span className="font-medium">{formatCurrency(fundingFee)}</span>
-                  </div>
-                  
-                  <div className="flex justify-between pb-4 border-b border-gray-200">
-                    <span className="text-gray-700">Total Loan Amount:</span>
-                    <span className="font-medium">{formatCurrency(loanAmount + fundingFee)}</span>
-                  </div>
-                  
-                  <div className="flex justify-between pb-4 border-b border-gray-200">
-                    <span className="text-gray-700">Interest Rate:</span>
-                    <span className="font-medium">{interestRate}%</span>
-                  </div>
-                  
-                  <div className="flex justify-between pb-4 border-b border-gray-200">
-                    <span className="text-gray-700">Loan Term:</span>
-                    <span className="font-medium">{loanTerm} years</span>
+          <div className="lg:col-span-2 bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
+            <div className="p-6 border-b border-gray-100 bg-gray-50">
+              <h3 className="text-lg font-semibold text-gray-900">Your Results</h3>
+              <p className="text-sm text-gray-600 mt-1">
+                {activeTab === 'payment' 
+                  ? 'Based on your loan details' 
+                  : 'Based on your financial profile'}
+              </p>
+            </div>
+            
+            <div className="p-6">
+              {activeTab === 'payment' ? (
+                <>
+                  <div className="mb-8">
+                    <div className="text-center">
+                      <span className="text-4xl font-bold text-primary">{formatCurrency(monthlyPayment)}</span>
+                      <p className="text-sm text-gray-500 mt-1">Estimated Monthly Payment</p>
+                    </div>
+                    
+                    <div className="mt-6 bg-gray-50 rounded-lg p-4">
+                      <div className="flex justify-between mb-2">
+                        <span className="text-sm text-gray-600">Principal & Interest:</span>
+                        <span className="text-sm font-medium">{formatCurrency(monthlyPayment)}</span>
+                      </div>
+                      <div className="flex justify-between mb-2">
+                        <span className="text-sm text-gray-600">VA Funding Fee:</span>
+                        <span className="text-sm font-medium">{formatCurrency(fundingFee)}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-sm text-gray-600">Funding Fee Added to Loan:</span>
+                        <span className="text-sm font-medium">Yes</span>
+                      </div>
+                    </div>
                   </div>
                   
-                  <div className="flex justify-between pt-2">
-                    <span className="text-gray-700 font-medium">Total Cost Over {loanTerm} Years:</span>
-                    <span className="font-bold">{formatCurrency(totalCost)}</span>
-                  </div>
-                </div>
-                
-                <div className="mt-8">
-                  <p className="text-sm text-gray-500 mb-4">
-                    <strong>Note:</strong> This calculator provides an estimate. Actual payment may vary based on exact interest rate, closing costs, and other factors.
-                  </p>
-                  <button className="btn btn-primary w-full">Get Pre-Approved</button>
-                </div>
-              </>
-            ) : (
-              <>
-                <h3 className="text-2xl font-semibold mb-6">Your Affordability Estimate</h3>
-                
-                <div className="mb-8">
-                  <div className="text-center">
-                    <span className="text-5xl font-bold text-primary">{formatCurrency(affordableAmount)}</span>
-                  </div>
-                  <p className="text-center text-gray-500 mt-2">Estimated Home Price</p>
-                </div>
-                
-                <div className="space-y-4">
-                  <div className="flex justify-between pb-4 border-b border-gray-200">
-                    <span className="text-gray-700">Annual Income:</span>
-                    <span className="font-medium">{formatCurrency(annualIncome)}</span>
+                  <div className="space-y-3 text-sm">
+                    <div className="flex justify-between pb-3 border-b border-gray-100">
+                      <span className="text-gray-600">Loan Amount:</span>
+                      <span className="font-medium">{formatCurrency(loanAmount)}</span>
+                    </div>
+                    
+                    <div className="flex justify-between pb-3 border-b border-gray-100">
+                      <span className="text-gray-600">Interest Rate:</span>
+                      <span className="font-medium">{interestRate}%</span>
+                    </div>
+                    
+                    <div className="flex justify-between pb-3 border-b border-gray-100">
+                      <span className="text-gray-600">Loan Term:</span>
+                      <span className="font-medium">{loanTerm} years</span>
+                    </div>
+                    
+                    <div className="flex justify-between pt-2">
+                      <span className="text-gray-700 font-medium">Total Cost Over {loanTerm} Years:</span>
+                      <span className="font-bold">{formatCurrency(totalCost)}</span>
+                    </div>
                   </div>
                   
-                  <div className="flex justify-between pb-4 border-b border-gray-200">
-                    <span className="text-gray-700">Monthly Income:</span>
-                    <span className="font-medium">{formatCurrency(annualIncome / 12)}</span>
+                  <div className="mt-8">
+                    <p className="text-xs text-gray-500 mb-4">
+                      <strong>Note:</strong> This calculator provides an estimate. Actual payment may vary based on exact interest rate, closing costs, and other factors.
+                    </p>
+                    <button className="w-full px-4 py-3 bg-primary hover:bg-primary-dark text-white text-sm font-medium rounded-md transition-colors duration-300 shadow-sm">
+                      Get Pre-Approved
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="mb-8">
+                    <div className="text-center">
+                      <span className="text-4xl font-bold text-primary">{formatCurrency(affordableAmount)}</span>
+                      <p className="text-sm text-gray-500 mt-1">Estimated Home Price</p>
+                    </div>
+                    
+                    <div className="mt-6 bg-gray-50 rounded-lg p-4">
+                      <div className="flex justify-between mb-2">
+                        <span className="text-sm text-gray-600">Monthly Income:</span>
+                        <span className="text-sm font-medium">{formatCurrency(annualIncome / 12)}</span>
+                      </div>
+                      <div className="flex justify-between mb-2">
+                        <span className="text-sm text-gray-600">Debt-to-Income Ratio:</span>
+                        <span className="text-sm font-medium">41%</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-sm text-gray-600">Estimated Monthly Payment:</span>
+                        <span className="text-sm font-medium">{formatCurrency((affordableAmount - downPayment) * (5.5 / 100 / 12) * Math.pow(1 + (5.5 / 100 / 12), 360) / (Math.pow(1 + (5.5 / 100 / 12), 360) - 1))}</span>
+                      </div>
+                    </div>
                   </div>
                   
-                  <div className="flex justify-between pb-4 border-b border-gray-200">
-                    <span className="text-gray-700">Monthly Debts:</span>
-                    <span className="font-medium">{formatCurrency(monthlyDebts)}</span>
+                  <div className="space-y-3 text-sm">
+                    <div className="flex justify-between pb-3 border-b border-gray-100">
+                      <span className="text-gray-600">Annual Income:</span>
+                      <span className="font-medium">{formatCurrency(annualIncome)}</span>
+                    </div>
+                    
+                    <div className="flex justify-between pb-3 border-b border-gray-100">
+                      <span className="text-gray-600">Monthly Debts:</span>
+                      <span className="font-medium">{formatCurrency(monthlyDebts)}</span>
+                    </div>
+                    
+                    <div className="flex justify-between pb-3 border-b border-gray-100">
+                      <span className="text-gray-600">Down Payment:</span>
+                      <span className="font-medium">{formatCurrency(downPayment)}</span>
+                    </div>
+                    
+                    <div className="flex justify-between pt-2">
+                      <span className="text-gray-700 font-medium">Loan Amount:</span>
+                      <span className="font-bold">{formatCurrency(affordableAmount - downPayment)}</span>
+                    </div>
                   </div>
                   
-                  <div className="flex justify-between pb-4 border-b border-gray-200">
-                    <span className="text-gray-700">Down Payment:</span>
-                    <span className="font-medium">{formatCurrency(downPayment)}</span>
+                  <div className="mt-8">
+                    <p className="text-xs text-gray-500 mb-4">
+                      <strong>Note:</strong> This calculator provides an estimate based on a 30-year fixed VA loan at 5.5% interest. Actual affordability may vary based on credit score, debt-to-income ratio, and other factors.
+                    </p>
+                    <button className="w-full px-4 py-3 bg-primary hover:bg-primary-dark text-white text-sm font-medium rounded-md transition-colors duration-300 shadow-sm">
+                      Find Homes In Your Range
+                    </button>
                   </div>
-                  
-                  <div className="flex justify-between pt-2">
-                    <span className="text-gray-700 font-medium">Estimated Monthly Payment:</span>
-                    <span className="font-bold">{formatCurrency((affordableAmount - downPayment) * (5.5 / 100 / 12) * Math.pow(1 + (5.5 / 100 / 12), 360) / (Math.pow(1 + (5.5 / 100 / 12), 360) - 1))}</span>
-                  </div>
-                </div>
-                
-                <div className="mt-8">
-                  <p className="text-sm text-gray-500 mb-4">
-                    <strong>Note:</strong> This calculator provides an estimate based on a 30-year fixed VA loan at 5.5% interest. Actual affordability may vary based on credit score, debt-to-income ratio, and other factors.
-                  </p>
-                  <button className="btn btn-primary w-full">Find Homes In Your Range</button>
-                </div>
-              </>
-            )}
+                </>
+              )}
+            </div>
           </div>
         </div>
       </div>
